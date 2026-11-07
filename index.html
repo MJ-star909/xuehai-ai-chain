@@ -1,0 +1,3209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes, shrink-to-fit=no">
+<meta name="format-detection" content="telephone=no">
+<title>学海无涯 · AI 逻辑链（3D 环形）</title>
+<meta name="description" content="用两个环把 AI 产业链和思考过程讲明白：外环 = AI 怎么被造出来，内环 = AI 怎么想出一个词，64 个名词点开看大白话解释。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="学海无涯 · AI 逻辑链">
+<meta property="og:description" content="用两个环把 AI 产业链和思考过程讲明白：外环 = AI 怎么被造出来，内环 = AI 怎么想出一个词，64 个名词点开看大白话解释。">
+<meta property="og:image" content="https://mj-star909.github.io/xuehai-ai-chain/share.png">
+<meta property="og:url" content="https://mj-star909.github.io/xuehai-ai-chain/">
+<style>
+  :root{
+    --deep:#14506e; --blue:#2f7fb5; --teal:#1f948c; --gold:#b45309;
+    --ink:#0d3b55; --muted:#4f7f9c;
+    --line:rgba(47,127,181,.22);
+    --panel:rgba(9,38,60,.93);
+  }
+  *{box-sizing:border-box}
+  #sea{touch-action:pinch-zoom}
+  html,body{height:100%;margin:0;overflow:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    background:#eaf7fe;color:var(--ink);
+    font-family:"Microsoft YaHei","微软雅黑","PingFang SC","SimHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #sea{position:fixed;inset:0;display:block;cursor:grab}
+  #sea.grabbing{cursor:grabbing}
+
+  .hud{position:fixed;inset:0;pointer-events:none}
+  .hud > *{pointer-events:auto}
+
+  header{
+    position:absolute;left:26px;top:22px;right:26px;display:flex;justify-content:space-between;
+    align-items:flex-start;gap:20px;flex-wrap:wrap;
+  }
+  .brand h1{
+    margin:0;font-size:26px;letter-spacing:2px;font-weight:800;
+    background:linear-gradient(90deg,#0f4562,#2f7fb5 55%,#1f948c);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 2px 22px rgba(255,255,255,.85);
+  }
+  .brand p{margin:6px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.4px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .controls button{
+    font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:999px;cursor:pointer;
+    color:#14506e;background:rgba(255,255,255,.62);border:1px solid rgba(47,127,181,.26);
+    backdrop-filter:blur(8px);transition:.18s;letter-spacing:.3px;
+  }
+  .controls button:hover{border-color:rgba(47,127,181,.7);color:#082c42;box-shadow:0 4px 14px rgba(47,127,181,.16)}
+  .controls button.active{
+    background:rgba(47,127,181,.16);border-color:rgba(47,127,181,.8);color:#082c42;
+    box-shadow:0 4px 14px rgba(47,127,181,.22);
+  }
+
+  .legend{
+    position:absolute;left:26px;bottom:22px;display:flex;flex-direction:column;gap:7px;
+    font-size:12px;color:#3f6d8b;line-height:1.6;
+    background:rgba(255,255,255,.6);border:1px solid rgba(47,127,181,.2);border-radius:14px;
+    padding:12px 16px;backdrop-filter:blur(10px);
+  }
+  .legend .row{display:flex;align-items:center;gap:8px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .dot.outer{background:radial-gradient(circle at 32% 30%,#f2fbff,#2f7fb5 55%,#14506e);box-shadow:0 0 10px rgba(47,127,181,.65)}
+  .dot.inner{background:radial-gradient(circle at 32% 30%,#e9fbf8,#1f948c 55%,#0f5f59);box-shadow:0 0 10px rgba(31,148,140,.6)}
+  .legend .hint{color:rgba(79,127,156,.8);font-size:11.5px}
+
+  .center-title{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    text-align:center;pointer-events:none;user-select:none;
+  }
+  .center-title span{
+    display:block;font-size:44px;font-weight:800;letter-spacing:10px;color:#14506e;
+    text-shadow:0 2px 18px rgba(255,255,255,.95),0 0 46px rgba(47,127,181,.38);
+  }
+  .center-title small{
+    display:block;margin-top:8px;font-size:12px;letter-spacing:5px;color:#5d8ba8;
+  }
+
+  #panel{
+    position:absolute;right:24px;top:104px;width:392px;max-height:calc(100vh - 140px);
+    overflow:auto;border-radius:18px;padding:20px 22px;
+    background:var(--panel);border:1px solid rgba(125,211,252,.38);
+    box-shadow:0 26px 60px rgba(10,40,64,.35),0 0 40px rgba(56,189,248,.12) inset;
+    backdrop-filter:blur(14px);color:#e0f2fe;
+    transform:translateX(calc(100% + 40px));opacity:0;
+    transition:transform .38s cubic-bezier(.22,.9,.3,1),opacity .3s ease;
+  }
+  #panel.show{transform:translateX(0);opacity:1}
+  #panel.noanim{transition:none !important}
+  #panel::-webkit-scrollbar{width:6px}
+  #panel::-webkit-scrollbar-thumb{background:rgba(125,211,252,.4);border-radius:6px}
+  #panel .close{
+    position:absolute;right:14px;top:12px;width:28px;height:28px;border-radius:9px;
+    border:1px solid rgba(125,211,252,.3);background:rgba(56,189,248,.12);color:#bae6fd;
+    cursor:pointer;font-size:15px;line-height:1;
+  }
+  #panel .close:hover{background:rgba(56,189,248,.26)}
+  .p-tag{display:inline-block;font-size:11px;letter-spacing:2px;padding:3px 10px;border-radius:999px}
+  .p-tag.outer{color:#bae6fd;background:rgba(56,189,248,.16);border:1px solid rgba(125,211,252,.5)}
+  .p-tag.inner{color:#99f6e4;background:rgba(45,212,191,.14);border:1px solid rgba(94,234,212,.5)}
+  .life{
+    margin:12px 0 4px;padding:12px 14px 13px;border-radius:13px;
+    background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(45,212,191,.12));
+    border:1px solid rgba(125,211,252,.4);box-shadow:0 0 24px rgba(56,189,248,.12) inset;
+  }
+  .life .k{
+    display:inline-block;font-size:11px;letter-spacing:2px;color:#7dd3fc;
+    background:rgba(56,189,248,.16);padding:1px 8px;border-radius:6px;margin-bottom:6px;
+  }
+  .life .v{font-size:14.5px;line-height:1.8;color:#eaf7ff}
+  .life .v b{color:#fbbf24}
+  #panel h2{margin:10px 0 2px;font-size:22px;letter-spacing:1px;color:#f0f9ff}
+  #panel .en{font-size:12px;color:#7fb8d4;letter-spacing:.6px;margin-bottom:14px}
+  .field{margin:13px 0;padding-top:12px;border-top:1px dashed rgba(125,211,252,.2)}
+  .field:first-of-type{border-top:none;padding-top:0}
+  .field .k{
+    display:inline-block;font-size:11px;letter-spacing:2px;color:#7dd3fc;
+    padding:1px 8px;border-radius:6px;background:rgba(56,189,248,.14);margin-bottom:6px;
+  }
+  .field .v{font-size:13.5px;line-height:1.85;color:#dbeafe}
+  .field.concl .v{color:#fde68a}
+  .field.link .v{color:#a7f3d0}
+  #panel .termwrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  #panel .termchip{font-family:inherit;font-size:12px;padding:4px 9px;border-radius:8px;cursor:pointer;
+    background:rgba(56,189,248,.12);border:1px solid rgba(125,211,252,.35);color:#bae6fd;transition:.15s}
+  #panel .termchip:hover{background:rgba(56,189,248,.3);color:#fff}
+  #panel .morebtn{width:100%;margin:10px 0 2px;padding:9px;border-radius:10px;cursor:pointer;
+    font-family:inherit;font-size:12.5px;letter-spacing:.4px;color:#bae6fd;
+    background:rgba(56,189,248,.1);border:1px dashed rgba(125,211,252,.45)}
+  #panel .morebtn:hover{background:rgba(56,189,248,.2)}
+
+  /* ---------- 新手引导 ---------- */
+  #guide{position:fixed;inset:0;z-index:90;display:none;pointer-events:none}
+  #guide.show{display:block}
+  #spot{position:fixed;pointer-events:none;transition:all .35s ease;
+    box-shadow:0 0 0 9999px rgba(4,20,34,.55);border:2px solid rgba(56,189,248,.95)}
+  #gtip{position:fixed;width:330px;background:#fff;border-radius:16px;padding:16px 18px;
+    box-shadow:0 24px 60px rgba(4,20,34,.4);color:#0d3b55;pointer-events:auto;
+    transition:all .35s ease}
+  #gtip .gstep{font-size:11px;letter-spacing:2.5px;color:#2f7fb5}
+  #gtip h3{margin:4px 0 6px;font-size:16.5px;color:#0f4562}
+  #gtip p{margin:0;font-size:13.5px;line-height:1.85;color:#33566b}
+  #gtip .gactions{display:flex;gap:8px;align-items:center;margin-top:14px}
+  #gtip .gspacer{flex:1}
+  #gtip button{font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:999px;cursor:pointer}
+  #gtip .gskip{background:transparent;border:none;color:#8aa9bd;text-decoration:underline}
+  #gtip .gghost{background:#fff;border:1px solid rgba(47,127,181,.35);color:#14506e}
+  #gtip .ggo{background:linear-gradient(90deg,#2f7fb5,#1f948c);border:none;color:#fff;font-weight:700}
+
+  /* ---------- 提示条 ---------- */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    z-index:70;max-width:min(560px,calc(100% - 32px));padding:11px 20px;border-radius:999px;
+    background:rgba(6,34,54,.9);color:#e0f2fe;font-size:13px;line-height:1.7;
+    box-shadow:0 12px 30px rgba(4,20,34,.35);opacity:0;pointer-events:none;transition:all .3s ease}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #panel .relbtn{
+    margin-top:14px;width:100%;padding:9px;border-radius:10px;cursor:pointer;font-family:inherit;
+    font-size:12.5px;color:#062a3f;background:linear-gradient(90deg,#7dd3fc,#5eead4);
+    border:none;font-weight:700;letter-spacing:1px;
+  }
+  #panel .relbtn:hover{filter:brightness(1.06)}
+
+  @media (max-width:760px){
+    .brand h1{font-size:19px}
+    .brand p{display:none}
+    #panel{left:16px;right:16px;top:auto;bottom:16px;width:auto;max-height:52vh}
+    .legend{display:none}
+    .center-title{top:132px;transform:translateX(-50%)}
+    .center-title span{font-size:24px;letter-spacing:4px}
+    .center-title small{font-size:11px;letter-spacing:2px;margin-top:4px}
+    .center-title em{display:none}
+    .controls button{font-size:12px;padding:7px 11px}
+  }
+
+  /* ---------- 名词库 ---------- */
+  #panel{z-index:60}
+  #nouns{position:fixed;inset:0;z-index:40;display:none;padding:22px;overflow:auto;
+    background:rgba(10,40,64,.32);backdrop-filter:blur(8px)}
+  #nouns.show{display:block}
+  #nouns .sheet{max-width:1560px;margin:0 auto;background:rgba(255,255,255,.94);
+    border:1px solid rgba(47,127,181,.25);border-radius:20px;
+    box-shadow:0 30px 70px rgba(6,30,48,.32);padding:22px 26px 18px;color:var(--ink);
+    animation:sheetIn .3s ease}
+  @keyframes sheetIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #nouns .nhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  #nouns .nhead h2{margin:0;font-size:20px;color:#14506e}
+  #nouns .nhead .nsub{font-size:12px;color:#6b93ad}
+  #nouns .nclose{margin-left:auto;width:32px;height:32px;border-radius:10px;
+    border:1px solid rgba(47,127,181,.3);background:#fff;color:#14506e;cursor:pointer;font-size:17px}
+  #nouns .nclose:hover{background:#eaf7fe}
+  #nouns .stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-top:16px}
+  #nouns .stage{background:linear-gradient(180deg,#eaf7fe,#ffffff);border:1px solid rgba(47,127,181,.2);
+    border-radius:14px;padding:12px 14px}
+  #nouns .stage h3{margin:0;font-size:13.5px;color:#14506e;letter-spacing:.3px}
+  #nouns .stage .sub{font-size:11px;color:#6b93ad;margin:2px 0 9px}
+  #nouns .chips{display:flex;flex-wrap:wrap;gap:6px}
+  #nouns .chip{font-family:inherit;font-size:12.5px;padding:5px 9px;border-radius:9px;cursor:pointer;
+    background:#fff;border:1px solid rgba(47,127,181,.28);color:#14506e;transition:.15s}
+  #nouns .chip:hover{border-color:rgba(47,127,181,.7);box-shadow:0 4px 12px rgba(47,127,181,.15)}
+  #nouns .chip.sel{background:#14506e;border-color:#14506e;color:#fff}
+  #nouns .nnote{font-size:11.5px;color:#6b93ad;margin-top:12px}
+
+  /* ---------- 进门说明 ---------- */
+  #intro{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:24px;overflow:auto;
+    background:radial-gradient(900px 520px at 18% 0%,rgba(56,189,248,.2),transparent 60%),rgba(6,30,48,.55);
+    backdrop-filter:blur(10px)}
+  #intro.show{display:grid}
+  #intro .card{max-width:880px;width:100%;background:rgba(255,255,255,.96);border-radius:22px;
+    box-shadow:0 40px 90px rgba(4,20,34,.45);padding:30px 34px 24px;color:#0d3b55}
+  #intro .kicker{font-size:11.5px;letter-spacing:4px;color:#2f7fb5}
+  #intro h2{margin:8px 0;font-size:27px;letter-spacing:1px;color:#0f4562}
+  #intro .lead{margin:0 0 18px;font-size:15px;line-height:1.95;color:#33566b}
+  #intro .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  #intro .grid>div{background:linear-gradient(180deg,#eaf7fe,#ffffff);border:1px solid rgba(47,127,181,.2);
+    border-radius:14px;padding:14px 16px}
+  #intro .grid h3{margin:0 0 6px;font-size:14.5px;color:#14506e}
+  #intro .grid p{margin:0;font-size:13px;line-height:1.8;color:#33566b}
+  #intro .how{margin-top:14px;font-size:13px;line-height:1.8;color:#3f6d8b;
+    background:#f2fafd;border:1px dashed rgba(47,127,181,.25);border-radius:12px;padding:10px 14px}
+  #intro .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
+  #intro .actions button{font-family:inherit;font-size:13.5px;padding:9px 18px;border-radius:999px;cursor:pointer}
+  #intro .actions .go{background:linear-gradient(90deg,#2f7fb5,#1f948c);border:none;color:#fff;font-weight:700}
+  #intro .actions .ghost{background:#fff;border:1px solid rgba(47,127,181,.35);color:#14506e}
+  #intro .actions .plain{background:transparent;border:none;color:#7ea6bd;text-decoration:underline}
+  #intro .foot{margin-top:16px;font-size:11.5px;line-height:1.7;color:#7ea6bd}
+  @media (max-width:760px){
+    #intro .grid{grid-template-columns:1fr}
+    #intro .card{padding:22px 20px}
+    #intro h2{font-size:22px}
+  }
+  .center-title em{display:block;margin-top:10px;font-style:normal;font-size:12px;letter-spacing:1px;
+    color:rgba(19,78,105,.75);line-height:1.7}
+
+  /* ---------- 5 分钟总纲 ---------- */
+  #learn{position:fixed;inset:0;z-index:85;display:none;place-items:center;padding:22px;overflow:auto;
+    background:radial-gradient(900px 520px at 70% 0%,rgba(56,189,248,.18),transparent 60%),rgba(6,30,48,.5);
+    backdrop-filter:blur(10px)}
+  #learn.show{display:grid}
+  #learn .sheet{width:min(1080px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.97);
+    border-radius:22px;padding:22px 26px;box-shadow:0 40px 90px rgba(4,20,34,.45);color:#0d3b55}
+  #learn .lhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid rgba(47,127,181,.15);padding-bottom:14px}
+  #learn .lhead h2{margin:0;font-size:20px;color:#0f4562;flex:1}
+  #learn .ltabs{display:flex;gap:8px;flex-wrap:wrap}
+  #learn .ltab{font-family:inherit;font-size:12.5px;padding:7px 13px;border-radius:999px;cursor:pointer;
+    background:#fff;border:1px solid rgba(47,127,181,.3);color:#14506e}
+  #learn .ltab.active{background:linear-gradient(90deg,#2f7fb5,#1f948c);border-color:transparent;color:#fff;font-weight:700}
+  #learn .lbody{margin-top:16px;font-size:14px;line-height:1.9;color:#28536b}
+  #learn .lbody h3{margin:18px 0 8px;font-size:16px;color:#0f4562}
+  #learn .lbody p{margin:8px 0}
+  #learn .big3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  #learn .big3>div{background:linear-gradient(180deg,#eaf7fe,#fff);border:1px solid rgba(47,127,181,.18);
+    border-radius:14px;padding:14px 16px}
+  #learn .big3 b{display:block;font-size:14.5px;color:#14506e;margin-bottom:6px}
+  #learn .big3 span{font-size:13px;color:#33566b;line-height:1.8}
+  #learn table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+  #learn th,#learn td{border:1px solid rgba(47,127,181,.18);padding:9px 12px;text-align:left;vertical-align:top}
+  #learn th{background:#eef8fe;color:#14506e}
+  #learn .qbox{border:1px solid rgba(47,127,181,.2);border-radius:14px;padding:14px 16px;margin-top:12px;background:#fbfeff}
+  #learn .qbox h4{margin:0 0 8px;font-size:14px;color:#14506e}
+  #learn .qopts{display:flex;flex-wrap:wrap;gap:8px}
+  #learn .qopt{font-family:inherit;font-size:13px;padding:7px 12px;border-radius:10px;cursor:pointer;
+    background:#fff;border:1px solid rgba(47,127,181,.3);color:#28536b}
+  #learn .qopt.right{background:#dcfce7;border-color:#16a34a;color:#166534;font-weight:700}
+  #learn .qopt.wrong{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+  #learn .qexp{margin-top:8px;font-size:12.5px;color:#4f7f9c;display:none}
+  #learn .qexp.show{display:block}
+  #learn .sum{margin-top:16px;padding:14px 16px;border-radius:14px;font-size:14px;color:#0f4562;
+    background:linear-gradient(90deg,#e0f2fe,#ecfdf5)}
+
+  /* ---------- 新手必看 10 词 ---------- */
+  .starter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;padding:12px 14px;
+    border-radius:14px;background:#f2fafd;border:1px dashed rgba(47,127,181,.3)}
+  .starter b{font-size:12.5px;color:#14506e}
+  .starter .scount{font-size:11.5px;color:#5d8ba8;margin-left:auto}
+  .starter .schip{font-family:inherit;font-size:12px;padding:5px 10px;border-radius:999px;cursor:pointer;
+    background:#fff;border:1px solid rgba(47,127,181,.3);color:#14506e}
+  .starter .schip.done{background:#dcfce7;border-color:#16a34a;color:#166534}
+  .term-link{color:#0e7490;font-weight:700;border-bottom:1px dashed rgba(14,116,144,.55);cursor:pointer}
+  .term-link:hover{color:#b45309;border-color:rgba(180,83,9,.6)}
+
+  /* ---------- 内环贯穿示例 ---------- */
+  #panel .demo{margin:10px 0 2px;padding:12px 14px;border-radius:12px;background:rgba(45,212,191,.08);
+    border:1px solid rgba(45,212,191,.3)}
+  #panel .demo .dq{font-size:12px;color:#7dd3fc;margin-bottom:6px}
+  #panel .demo ol{margin:0;padding-left:18px}
+  #panel .demo li{font-size:11.8px;line-height:1.75;color:#c7e6f2;margin:2px 0}
+  #panel .demo li.now{color:#fde68a;font-weight:700}
+  #panel .demo .dr{font-size:12px;color:#a7f3d0;margin-top:6px}
+
+  /* ---------- 视图菜单 ---------- */
+  .viewmenu{position:relative;display:inline-block}
+  .viewmenu .vmenu{display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:20;
+    background:rgba(255,255,255,.98);border-radius:12px;padding:6px;
+    box-shadow:0 16px 40px rgba(4,20,34,.25);flex-direction:column;gap:4px;min-width:132px}
+  .viewmenu .vmenu.open{display:flex}
+  .viewmenu .vmenu button{width:100%;text-align:left;background:transparent;border:none;border-radius:8px;
+    padding:7px 10px;font-size:12.5px;color:#14506e;cursor:pointer}
+  .viewmenu .vmenu button:hover{background:#eef8fe}
+  .viewmenu .vmenu button.active{background:linear-gradient(90deg,#2f7fb5,#1f948c);color:#fff}
+
+  /* ---------- 门页总纲 ---------- */
+  #intro .essence{margin:0 0 16px;padding:12px 16px;border-radius:14px;
+    background:linear-gradient(90deg,#fffbeb,#eff8ff);border:1px solid rgba(180,131,9,.25);
+    font-size:13px;line-height:1.9;color:#3b5566}
+  #intro .essence b{display:block;color:#0f4562;margin-bottom:4px}
+  #intro .essence span{display:block}
+  /* ---------- 白话别名 ---------- */
+  #panel .alias{margin:2px 0 10px;font-size:13px;color:#7dd3fc;letter-spacing:.5px}
+  #panel .termstage{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;
+    font-size:12px;color:#7dd3fc}
+  #panel .stagebtn{font-family:inherit;font-size:11.5px;padding:4px 11px;border-radius:999px;cursor:pointer;
+    background:rgba(56,189,248,.16);border:1px solid rgba(125,211,252,.5);color:#bae6fd}
+  #panel .stagebtn:hover{background:rgba(56,189,248,.32);color:#fff}
+  #panel .stagehint{margin:8px 0;padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);
+    border-left:2px solid rgba(125,211,252,.6);font-size:11.8px;line-height:1.6;color:#a5d8ee}
+
+  /* ---------- 大字模式 ---------- */
+  body.bigfont #panel .field .v{font-size:15.5px;line-height:1.95}
+  body.bigfont #panel .life .v{font-size:15px}
+  body.bigfont #panel .alias{font-size:14px}
+  body.bigfont #panel h2{font-size:23px}
+  body.bigfont #panel .demo li{font-size:13px}
+  body.bigfont .legend{font-size:13px}
+  body.bigfont .legend .hint{font-size:12.5px}
+  body.bigfont #nouns .chip{font-size:14px;padding:6px 12px}
+  body.bigfont #learn .lbody{font-size:15.5px}
+  body.bigfont #learn table{font-size:14.5px}
+  body.bigfont #intro .lead{font-size:16px}
+  body.bigfont #intro .grid p{font-size:14px}
+  body.bigfont #intro .essence{font-size:14px}
+  body.bigfont .starter .schip{font-size:13px}
+  body.bigfont #gtip p{font-size:14.5px}
+  .viewmenu .vmenu{max-height:calc(100vh - 120px);overflow:auto}
+
+  /* ---------- 手机性能模式：关掉毛玻璃，减少 GPU 压力 ---------- */
+  @media (max-width:760px){
+    #panel,#nouns,#intro,#learn{backdrop-filter:none}
+    #panel{background:rgba(9,38,60,.97)}
+    #nouns{background:rgba(8,32,50,.62)}
+    #intro,#learn{background:rgba(6,30,48,.66)}
+    #panel .field .v,#panel .life .v{text-rendering:optimizeSpeed}
+  }
+
+  /* ---------- 手机缩放按钮 ---------- */
+  .zoombar{position:fixed;right:18px;bottom:22px;z-index:50;display:flex;flex-direction:column;gap:8px;
+    pointer-events:auto}
+  .zoombar button{width:46px;height:46px;border-radius:50%;cursor:pointer;
+    border:1px solid rgba(47,127,181,.35);background:rgba(255,255,255,.84);
+    backdrop-filter:blur(8px);color:#14506e;font-size:22px;line-height:1;
+    box-shadow:0 8px 20px rgba(10,40,64,.18)}
+  .zoombar button:active{transform:scale(.94)}
+  @media (max-width:760px){ .zoombar{right:14px;bottom:18px} }
+</style>
+</head>
+<body>
+<canvas id="sea"></canvas>
+
+<div class="hud">
+  <header>
+    <div class="brand">
+      <h1>学海无涯 · AI 逻辑链</h1>
+      <p>把 AI 的运行逻辑画成一张能转的 3D 图 · 外环 = AI 产业链，内环 = AI 思考链 · 点节点看解释</p>
+    </div>
+    <div class="controls">
+      <button id="btnIntro">介绍</button>
+      <button id="btnLearn">5 分钟总纲</button>
+      <button id="btnNouns">名词库</button>
+      <button id="btnSound">流水声</button>
+      <div class="viewmenu">
+        <button id="btnMore">更多 ▾</button>
+        <div class="vmenu" id="moreMenu">
+          <button id="btnSpin" class="active">自动旋转</button>
+          <button id="btnSat" class="active">名词卫星</button>
+          <button id="btnCalm">低动效</button>
+          <button id="btnFont">大字模式</button>
+          <button id="btnOuter">只看外链</button>
+          <button id="btnInner">只看内链</button>
+          <button id="btnAll" class="active">全部</button>
+          <button id="btnReset">重置视角</button>
+          <button id="rotateLeft">左转 ↺</button>
+          <button id="rotateRight">右转 ↻</button>
+          <button id="zoomInMenu">放大 ＋</button>
+          <button id="zoomOutMenu">缩小 －</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <div class="row"><i class="dot outer"></i>外环：AI 产业链（怎么造出来）</div>
+    <div class="row"><i class="dot inner"></i>内环：AI 思考链（怎么想出一个词）</div>
+    <div class="hint">点大球看这一环 · 点小球看属于它的名词</div>
+    <div class="hint">拖动旋转 · 双指缩放页面 · 右下角 ＋－ 放大画面</div>
+  </div>
+  <div class="zoombar">
+    <button id="zoomIn" title="放大">＋</button>
+    <button id="zoomOut" title="缩小">－</button>
+  </div>
+</div>
+
+<div id="nouns">
+  <div class="sheet">
+    <div class="nhead">
+      <h2>名词库 · 按外环 8 环节分组</h2>
+      <span class="nsub">64 个名词 · 按外环 8 个环节排列 · 点名词看「大白话 / 打个比方 / AI 什么时候用 / 什么时候会遇到」</span>
+      <button class="nclose" id="nounsClose">×</button>
+    </div>
+    <div class="starter" id="starter"></div>
+    <div class="stages" id="nounsBody"></div>
+    <div class="nnote">顺序与外环一致：① 数据 → ② 训练 → ③ 模型 → ④ 调用 → ⑤ 部署 → ⑥ 产品 → ⑦ 成本 → ⑧ 安全 · 内容来自《AI名词大全-64词》</div>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="card">
+    <div class="kicker">给第一次看到的人</div>
+    <h2>这张图是干什么的？</h2>
+    <p class="lead">把「AI 到底怎么运行」画成两张会转的环，再配一本 64 个词的词典。不懂技术的人，也能在 5 分钟内看懂：AI 怎么被造出来、每说一个词时内部怎么转。</p>
+    <div class="essence">
+      <b>先记住三句话（整个页面都在讲这三句）：</b>
+      <span>1. AI 干的事，是看上文、猜下一个词。</span>
+      <span>2. 猜出一个词就接回去，循环几十上百次，凑成一句回答。</span>
+      <span>3. 训练时才改参数；调用时参数不变——所以它不会越聊越聪明。</span>
+    </div>
+    <div class="grid">
+      <div>
+        <h3>① 外环 · AI 产业链</h3>
+        <p>数据 → 训练 → 模型 → 调用 → 部署 → 产品 → 成本 → 安全。回答：AI 是怎么被造出来、卖出去、管起来的。</p>
+      </div>
+      <div>
+        <h3>② 内环 · AI 思考链</h3>
+        <p>切块 → 向量化 → 排位置 → 找关系 → 深加工 → 算概率 → 做选择 → 接回去。回答：AI 每说一个词，内部到底发生了什么。</p>
+      </div>
+      <div>
+        <h3>③ 名词库 · 64 词</h3>
+        <p>和外环同一套分组：数据、训练、模型、调用、部署、产品、成本、安全。每个大环节周围还绕着一圈相关名词（小球），按运行顺序排列——点大球亮起，点小球看「大白话 / 打个比方 / AI 什么时候用 / 什么时候会遇到」。</p>
+      </div>
+    </div>
+    <div class="how"><b>怎么用：</b>拖动旋转 → 点发光节点看详情 → 点顶部「名词库」查词。<br><b>手机：</b>双指捏合可缩放整个页面，放大后单指自由滑动查看；页面 100% 时单指拖动旋转画面；右下角 <b>＋ / －</b> 放大 3D 画面。</div>
+    <div class="actions">
+      <button class="go" id="introStart">开始探索 →</button>
+      <button class="ghost" id="introNouns">直接打开名词库</button>
+      <button class="plain" id="introClose">跳过，下次再说</button>
+    </div>
+    <div class="foot">内容来源：《AI名词大全-64词》《AI名词深究-工程层》等；名词库由原文自动解析生成。页面完全离线运行，可直接双击打开或发给别人。</div>
+  </div>
+</div>
+
+<div id="guide">
+  <div id="spot"></div>
+  <div id="gtip">
+    <div class="gstep" id="gstep">1 / 3</div>
+    <h3 id="gtitle"></h3>
+    <p id="gtext"></p>
+    <div class="gactions">
+      <button class="gskip" id="gskip">跳过引导</button>
+      <span class="gspacer"></span>
+      <button class="gghost" id="gprev">上一步</button>
+      <button class="ggo" id="gnext">下一步</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<div id="learn">
+  <div class="sheet">
+    <div class="lhead">
+      <h2>5 分钟总纲 · 先看懂 AI</h2>
+      <div class="ltabs">
+        <button class="ltab active" data-tab="essence">总纲</button>
+        <button class="ltab" data-tab="diff">训练 vs 调用</button>
+        <button class="ltab" data-tab="hallu">AI 为什么会胡说</button>
+        <button class="ltab" data-tab="quiz">5 问自检</button>
+      </div>
+      <button class="nclose" id="learnClose">×</button>
+    </div>
+    <div class="lbody" id="learnBody"></div>
+  </div>
+</div>
+
+<aside id="panel">
+  <button class="close" id="panelClose">×</button>
+  <div id="panelBody"></div>
+</aside>
+
+<script>
+  // 出错时把错误显示在页面底部，避免“白屏但不知道为什么”
+  (function () {
+    function showErr(msg) {
+      var d = document.getElementById("errbar");
+      if (!d) {
+        d = document.createElement("div");
+        d.id = "errbar";
+        d.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#7f1d1d;color:#fff;font:13px/1.7 'Microsoft YaHei',sans-serif;padding:10px 16px;white-space:pre-wrap";
+        document.body.appendChild(d);
+      }
+      d.textContent = "页面脚本出错：" + msg + "  （把这段文字发给我即可定位）";
+    }
+    window.addEventListener("error", function (e) {
+      showErr((e.message || e.error) + " @" + (e.filename || "") + ":" + (e.lineno || ""));
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      showErr(String(e.reason));
+    });
+  })();
+</script>
+<script>
+/* 自动生成：名词库（按外环 8 环节分组，含「AI 什么时候用」） */
+window.NOUNS = {
+ "total": 64,
+ "stages": [
+  {
+   "name": "① 数据",
+   "sub": "原料从哪来：收集、标注、存储、检索",
+   "terms": [
+    {
+     "name": "数据标注（Data Annotation）",
+     "plain": "人工给原始数据打上\"标准答案\"，比如给一万张图框出猫在哪，AI 才有教材可学。",
+     "analogy": "给练习题配答案册。题再多，没答案孩子也学不会。",
+     "encounter": "要训练或微调一个专用模型时，第一件麻烦事通常是组织和标注数据，成本往往比算力还高。",
+     "use": "训练前，AI 要靠人先把原始资料标成「题目 + 标准答案」，它才知道学什么。"
+    },
+    {
+     "name": "知识库",
+     "plain": "把一批文档整理成 AI 能快速查找的资料库，通常就是 RAG 用来\"翻书\"的那本书。",
+     "analogy": "图书馆的分类索引卡——书还是那些书，有卡片几十秒就能定位到那一页。",
+     "encounter": "公司要上 AI 助手，把产品手册、合同模板、历史工单交给它用，第一步就是建知识库。",
+     "use": "AI 回答前先去里面查资料，避免凭空编（RAG 就靠它）。"
+    },
+    {
+     "name": "知识图谱（Knowledge Graph）",
+     "plain": "把\"人、公司、产品\"这些实体和它们之间的关系，画成一张可以查询的关系网。",
+     "analogy": "像一张人物关系图，谁在哪家公司、哪家公司属于哪个集团，一目了然，还能顺着线一路追下去。",
+     "encounter": "风控查关联公司、医疗辅助诊断、搜索引擎右侧的\"相关人物\"卡片。",
+     "use": "AI 需要理清「谁和谁是什么关系」时，用它把关系串起来。"
+    },
+    {
+     "name": "向量数据库（Vector Database）",
+     "plain": "专门存放「表示意思的那串数字」、并且能飞快找出「最相似几条」的仓库。",
+     "analogy": "普通仓库按编号找货，这个仓库按\"长得像不像\"找货，你说\"找和这件最像的十件\"，它立刻给你。",
+     "encounter": "企业把几万份文档做成\"问一句就能查\"的知识库时，后台通常得有一台向量数据库，比如 Milvus、Pinecone。",
+     "use": "AI 要按「意思相近」找内容时，把文字变成向量存进去、按相似度检索。"
+    },
+    {
+     "name": "语义搜索（Semantic Search）",
+     "plain": "按\"意思\"搜，不是按\"字面\"搜。你搜\"怎么退钱\"，它也能找到标题叫\"退款流程\"的文章。",
+     "analogy": "老式搜索像查字典，必须字对上；语义搜索像问一个读过全部资料的同事，他听得懂你的意思。",
+     "encounter": "公司内部知识库、电商商品搜索、客服机器人。关键词搜不出结果时，换成它往往就搜到了。",
+     "use": "用户搜一句话，AI 按「意思」而不是字面去匹配结果时用它。"
+    },
+    {
+     "name": "数据隐私与脱敏（Data Privacy & Anonymization）",
+     "plain": "把数据里的姓名、手机号、身份证号、住址等能对应到真人的信息替换掉或删掉，再拿去使用或训练。",
+     "analogy": "借别人看体检报告前，先把姓名栏剪掉，只留指标。",
+     "encounter": "把内部文档交给外部大模型处理、把用户对话用于模型改进、跨部门共享数据表之前。常见做法：\"张*\"\"138****1234\"。",
+     "use": "训练和调用前，AI 先把姓名、电话等敏感信息处理掉，避免泄露。"
+    }
+   ]
+  },
+  {
+   "name": "② 训练",
+   "sub": "模型怎么学会：预训练、微调、对齐",
+   "terms": [
+    {
+     "name": "机器学习（Machine Learning）",
+     "plain": "不写死规则，而是给电脑看大量例子，让它自己总结规律，再用规律判断新情况。",
+     "analogy": "像教小孩认猫，你不用讲\"猫有尖耳朵、胡须\"，只要指着一堆照片说\"这是猫\"，看多了他自己就会认。",
+     "encounter": "垃圾邮件自动分类、银行判断交易是否可疑、视频网站猜你想看什么。",
+     "use": "AI 要「从数据里自动找规律」时用它，推荐系统、风控也在用。"
+    },
+    {
+     "name": "深度学习（Deep Learning）",
+     "plain": "机器学习里的一种做法，用很多层\"神经元\"搭成网络，逐层加工信息，越往后越抽象。",
+     "analogy": "像工厂流水线，第一道工序看颜色和边缘，第二道拼出眼睛鼻子，最后一道才判断\"这是张人脸\"。",
+     "encounter": "人脸解锁、语音转文字、拍照翻译、AI 修图，这些效果是最近十年才变好的，靠的就是它。",
+     "use": "数据多、任务难（图像 / 语音 / 语言）时，AI 用多层神经网络来学。"
+    },
+    {
+     "name": "预训练",
+     "plain": "在正式上岗前，先把海量文字（网页、书、代码）反复读一遍，从文字里学规律；这个\"通读打基础\"的阶段就是预训练。",
+     "analogy": "像新员工入职前先把公司十年的文档全翻一遍，没人教他具体怎么做，但翻完之后，行业术语和常见套路都熟悉了。",
+     "encounter": "听到\"这个模型是预训练了多少数据\"\"预训练成本几千万\"时，说的就是这个阶段。",
+     "use": "AI 先拿海量文本「通读一遍」，学会语言常识，这是大模型的第一步。"
+    },
+    {
+     "name": "下一个词预测",
+     "plain": "模型真正在学的只有一件事：看前面这些字，猜下一个字最可能是什么。",
+     "analogy": "像手机输入法打\"今天天气真\"，它立刻跳出\"好\"。模型每次也只做这一道填空题，但连起来就能写文章、答题、写代码。",
+     "encounter": "你想明白\"AI 为什么会一本正经胡说\"时就靠它：它只是在猜\"下一个最像的词\"，并非在查答案。",
+     "use": "预训练时 AI 一直在做「猜下一个词」，猜得多了就学会了说话。"
+    },
+    {
+     "name": "微调（Fine-tuning）",
+     "plain": "让一个已经读过海量资料的模型，再用一批专门例子练一遍，变成某个行当的能手。",
+     "analogy": "大学生毕业后的岗前培训——基础都有，但要学你们公司的具体规矩。",
+     "encounter": "想让模型写自家客服话术、审行业合同、按固定格式出报告，就会说\"这个得微调一下\"。",
+     "use": "AI 预训练完，用少量专业数据把它调成「懂这一行」的模型时用它。"
+    },
+    {
+     "name": "蒸馏（Distillation）",
+     "plain": "让一个小模型照着大模型的答案反复练，把大模型的本事压进小模型里。",
+     "analogy": "老师傅带徒弟，徒弟未必懂原理，但手上功夫能学个八九不离十。",
+     "encounter": "要把模型塞进手机，或想把每次调用的成本压下来时，靠蒸馏出的小模型顶班。",
+     "use": "AI 把大模型的本事教给小模型，让小模型跑得更快更省时用它。"
+    },
+    {
+     "name": "人类反馈强化学习（RLHF，Reinforcement Learning from Human Feedback）",
+     "plain": "先让人给模型的几个回答排优劣，再用这些偏好教模型往\"人觉得好\"的方向走。",
+     "analogy": "学徒做菜，师傅尝一口说这个好、那个咸了，做多了就摸到门道。",
+     "encounter": "你夸 AI\"说话真得体\"或嫌它啰嗦时，背后调它的通常就是这套方法。",
+     "use": "AI 学「人更喜欢哪种回答」时用它，ChatGPT 就是这样调的。"
+    },
+    {
+     "name": "对齐（Alignment）",
+     "plain": "让模型的行为符合人的意图和底线——不跑偏、不帮人干坏事、不硬编瞎话。",
+     "analogy": "新员工除了会干活，还得守公司规矩和职业道德。",
+     "encounter": "模型拒答危险问题、承认\"我不确定\"，或反过来闯祸上新闻，讨论的都是对齐。",
+     "use": "训练后期，AI 用它把行为往「有用、诚实、无害」上拉。"
+    },
+    {
+     "name": "规模定律与涌现能力（Scaling Law & Emergence）",
+     "plain": "规模定律指模型越大、数据越多，效果按规律稳步变好；涌现能力指规模过某个坎后，突然冒出之前完全没有的本事。",
+     "analogy": "像烧水，一直加热温度稳步上升，这是定律；到 100℃ 突然开始沸腾冒泡，这就是涌现。",
+     "encounter": "厂商说\"参数从 700 亿涨到 7000 亿\"，或你发现新模型突然会做数学题、会推理了。",
+     "use": "AI 团队决定「要不要继续加数据、加参数」时参考它。"
+    }
+   ]
+  },
+  {
+   "name": "③ 模型",
+   "sub": "模型长什么样：结构、家族、能力边界",
+   "terms": [
+    {
+     "name": "Transformer",
+     "plain": "一种神经网络结构，是现在几乎所有大模型的基础架构。它能让一句话里的所有词同时互相参考，不必一个字一个字排队处理。",
+     "analogy": "老办法像传话游戏，一句话传到后面已经走样；Transformer 像把整句话摊在桌面上，所有人一起看全貌再发表意见。",
+     "encounter": "看到\"GPT 的 T 就是 Transformer\"\"基于 Transformer 架构\"时。",
+     "use": "AI 处理一句话时，用它决定「每个词该重点看哪些词」。"
+    },
+    {
+     "name": "注意力机制",
+     "plain": "模型读一句话时，会自动判断\"现在这个词该重点看前面哪几个词\"，并给不同词分配不同权重。",
+     "analogy": "读\"小明把苹果给小红，因为她饿了\"时，你会自然把\"她\"和\"小红\"\"饿了\"对应上。",
+     "encounter": "它解释了模型为什么能处理长句子、记住前文人名；也用来判断它在长文里哪里\"没看仔细\"。",
+     "use": "AI 读句子时，靠它给不同词分配不同的关注度。"
+    },
+    {
+     "name": "大模型（LLM，Large Language Model，大语言模型）",
+     "plain": "用海量文字训练出来、参数量极大的语言模型，能读懂你写的话，也能接着往下写。",
+     "analogy": "像一个读完了整个图书馆的人，你说上半句，他能顺着接下半句。",
+     "encounter": "注册各种 AI 产品、用手机输入法的智能联想、公司接入 AI 客服，底层都是它。",
+     "use": "AI 要做写文章、写代码、问答这类通用语言任务时用它。"
+    },
+    {
+     "name": "Embedding（嵌入，也叫向量）",
+     "plain": "把一段文字、一张图变成一串数字，意思相近的内容，这串数字也接近。",
+     "analogy": "给每句话分配一个\"坐标\"。聊\"猫\"的句子住同一片区，聊\"报销\"的住另一片区，距离远近代表意思像不像。",
+     "encounter": "做搜索、推荐、去重、聚类时，第一步往往就是先给内容算嵌入。",
+     "use": "AI 要把文字、图片变成「能算相似度」的数字向量时用它。"
+    },
+    {
+     "name": "参数量（B，Billion，十亿）",
+     "plain": "模型内部可调数字的个数。7B 就是 70 亿个参数，通常越大越聪明也越贵。",
+     "analogy": "像员工的经验条数——经验多的判断更准，但工资高、反应慢；新人便宜轻快，但容易答偏。",
+     "encounter": "模型名里的 Llama-8B、Qwen-72B，选型时在\"够聪明\"和\"跑得动\"之间权衡。",
+     "use": "AI 选模型、估成本时看它——参数越多通常越强也越贵。"
+    },
+    {
+     "name": "开源模型 vs 闭源模型",
+     "plain": "开源是模型文件放出来，你下载、自己部署、能改；闭源只能调厂商接口，看不到内部。",
+     "analogy": "开源像买菜回家自己做，配方自由但得会开火；闭源像点外卖，省事但只能吃菜单上的。",
+     "encounter": "数据不能外传（医院、律所）用开源自建；只想快速试效果，闭源接口最省事。",
+     "use": "AI 选型时用——要自己部署改模型选开源，要省事、用最强能力选闭源。"
+    },
+    {
+     "name": "多模态（Multimodal）",
+     "plain": "一个模型能同时处理文字、图片、语音、视频等多种形式的信息，不必一种形式配一个模型。",
+     "analogy": "人眼耳并用——看照片、听说话、读文字用的是同一个大脑。",
+     "encounter": "拍冰箱食材问\"能做什么菜\"、让 AI 看截图找报错、语音对话助手。",
+     "use": "AI 要同时看懂图片、听声音、读文字时用它。"
+    },
+    {
+     "name": "自然语言处理（NLP，Natural Language Processing）",
+     "plain": "让计算机理解和处理人类日常语言的技术领域。",
+     "analogy": "教外国朋友学中文，只不过这个学生是台机器。",
+     "encounter": "翻译软件、语音转文字、邮件自动分类、评论情感分析。",
+     "use": "AI 要做翻译、分类、摘要、问答这类「处理文字」的任务时用它。"
+    },
+    {
+     "name": "计算机视觉（CV，Computer Vision）",
+     "plain": "让计算机\"看懂\"图片和视频的技术领域。",
+     "analogy": "给机器装上一双眼睛，再配一个会认东西的大脑。",
+     "encounter": "人脸解锁、车牌识别、拍照搜同款、体检时看片子找病灶。",
+     "use": "AI 要做识图、人脸、质检、自动驾驶看路时用它。"
+    },
+    {
+     "name": "推理模型（Reasoning Model）",
+     "plain": "回答前先在\"心里\"打草稿、一步步推演，再给结论，所以慢一点但难题做得更好。",
+     "analogy": "考试时先在草稿纸上列步骤，而不是张口就答。",
+     "encounter": "算数学题、查代码 bug、做复杂规划时，产品让你选\"深度思考\"模式，那就是它。",
+     "use": "AI 遇到数学、逻辑、多步推理题时，用它「先想清楚再回答」。"
+    },
+    {
+     "name": "幻觉（Hallucination）",
+     "plain": "AI 一本正经地编造不存在的事实，语气还特别确定。",
+     "analogy": "像一个记不清却死要面子的朋友，把道听途说讲得像亲眼所见。",
+     "encounter": "让它推荐论文、查法条、报数据时，书名和数字看着很像真的，一查根本没有。",
+     "use": "AI 一本正经编造事实时就是出现了幻觉，需要用检索、核对来防。"
+    },
+    {
+     "name": "AGI（Artificial General Intelligence，通用人工智能）",
+     "plain": "一个 AI 什么都会，能跨领域举一反三，换个行当不用重新训练。",
+     "analogy": "现在用的 AI 像专修水电的师傅，AGI 是啥都能修的全能师傅。",
+     "encounter": "新闻标题、厂商发布会上最常见。目前还在\"画饼\"阶段，并没有真正造出来。",
+     "use": "讨论「AI 什么时候能像人一样什么都会」时用这个词。"
+    }
+   ]
+  },
+  {
+   "name": "④ 调用",
+   "sub": "怎么跟它打交道：提示词、API、采样",
+   "terms": [
+    {
+     "name": "提示词（Prompt）",
+     "plain": "你输入给 AI 的那段话，它决定 AI 往哪个方向回答。",
+     "analogy": "像点外卖。你说\"来点吃的\"，店家只能随便塞一份；说\"不要辣、少饭、加个蛋\"，送来的才合口味。",
+     "encounter": "每次打开对话框打字都在写提示词。写得越具体，返工越少。",
+     "use": "每次让 AI 干活时，你输入的那段话就是提示词。"
+    },
+    {
+     "name": "系统提示（System Prompt）",
+     "plain": "在正式对话开始前，预先给 AI 设定的一段\"幕后设定\"，用户通常看不见。",
+     "analogy": "像餐厅服务员上班前的培训手册：先问几位、按什么顺序推荐菜。手册不变，但决定了所有服务的风格。",
+     "encounter": "使用别人做好的 AI 助手、客服机器人时，它总是同一种腔调，就是系统提示在起作用。",
+     "use": "产品上线前，用它给 AI 定身份和规矩（比如「你是客服，不许聊别的」）。"
+    },
+    {
+     "name": "角色设定",
+     "plain": "明确告诉 AI\"你现在是谁\"，让它用对应的口吻和能力范围回答。",
+     "analogy": "同一件事，问医生和问律师，答案完全不同。给 AI 分配角色，等于请对了人。",
+     "encounter": "想让 AI 当\"小学老师\"讲浅一点，或当\"严格编辑\"挑毛病，开头加一句\"你是……\"就够了。",
+     "use": "让 AI 扮演老师、律师、面试官时用它。"
+    },
+    {
+     "name": "少样本示例（Few-shot）",
+     "plain": "先给 AI 看几个\"输入 + 标准答案\"的例子，让它照着格式办事。",
+     "analogy": "新同事不会写周报，你甩给他三份以前写得好的，他立刻懂了套路。",
+     "encounter": "需要固定格式输出时，比如批量把商品名改成广告语、统一工单分类。给两三个例子，比写一大段规则管用。",
+     "use": "AI 不懂你要的格式时，给几个例子让它照着学。"
+    },
+    {
+     "name": "思维链（Chain of Thought）",
+     "plain": "让 AI 先把推理步骤一条条写出来，再给结论，答案往往更准。",
+     "analogy": "心算\"17×23\"容易错，拿笔列竖式就稳了。",
+     "encounter": "算账、逻辑题、多条件判断时，加一句\"请一步步分析\"，正确率明显提升。",
+     "use": "让 AI 做复杂题时，要求它「一步步写出推理过程」。"
+    },
+    {
+     "name": "提示词工程（Prompt Engineering）",
+     "plain": "研究\"话该怎么说\"才能让 AI 给出好结果，是一门调整提问方式的讲究。",
+     "analogy": "像跟新来的实习生交代任务，说\"弄个方案\"和说清\"给谁看、多长、几个部分\"，拿回来的东西天差地别。",
+     "encounter": "同一个 AI，别人用得又快又准、你用得又慢又偏，差别往往就在这儿。",
+     "use": "同一个模型，靠它把提示词改好，让回答更准更稳。"
+    },
+    {
+     "name": "长上下文（Long Context Window）",
+     "plain": "模型一次能同时容纳的文字总量，按 token（可粗略理解为一个字或半个词）计算。窗口越长，一次能读进去的资料越多。",
+     "analogy": "像一张桌子的桌面。桌面小只能摊一页纸；桌面大能同时铺开整本合同、附录和聊天记录。",
+     "encounter": "合同审阅、整份财报问答、几百页文档一次性交给模型分析时。窗口不够就得切块，而切块容易丢上下文。",
+     "use": "AI 要读整本书、整份合同、整个代码库时用它。"
+    },
+    {
+     "name": "温度（Temperature）",
+     "plain": "一个 0 到 1 之间的旋钮，用来调节模型\"敢不敢乱说\"。调低偏保守，调高更有创意。",
+     "analogy": "像点菜。温度低就点熟悉的那几道，不容易出错；温度高让厨师自由发挥，可能惊喜也可能踩雷。",
+     "encounter": "写文案、起名字时调高；做数据提取、写代码、客服问答时调低，甚至调到 0 求稳定。",
+     "use": "AI 生成回答时，用它控制「保守一点还是发散一点」。"
+    },
+    {
+     "name": "结构化输出（Structured Output，含 JSON 模式）",
+     "plain": "要求模型按固定格式输出，最常见的是 JSON（一种固定格式，用大括号和键值对表示数据，程序能直接读），这样程序就能接着用。",
+     "analogy": "让模型填表格，而不是写作文。表格填完就能录进系统，作文还得人再读一遍挑重点。",
+     "encounter": "把模型接入系统、批量处理数据时必用。比如从一千封邮件里抽出\"客户名、金额、日期\"。",
+     "use": "AI 要把回答变成 JSON、表格，方便程序接着用时用它。"
+    },
+    {
+     "name": "函数调用（Function Calling）",
+     "plain": "让模型不只输出文字，还能说\"我要调用某个功能\"，由你的程序真正去执行查天气、查订单、发邮件。",
+     "analogy": "模型像坐办公室的助理，自己不跑腿，写张纸条\"请查下明天北京天气\"，再派人去办。",
+     "encounter": "做能查数据库、能下单、能改日程的 AI 助手时，几乎都靠它。",
+     "use": "AI 需要查天气、下单、读数据库时，用它去调外部工具。"
+    },
+    {
+     "name": "API（Application Programming Interface，应用程序接口）",
+     "plain": "程序之间互相沟通的接口。你的软件不用懂模型内部怎么运行，按约定发请求、收结果就行。",
+     "analogy": "像餐厅的点菜窗口。你不用进厨房，按菜单格式报菜名，菜就从窗口递出来。",
+     "encounter": "想在自己的 App、网站、表格工具里用上 AI，就要走 API。计费和限速也是这么来的。",
+     "use": "你的产品要接 AI 能力时，通过它把请求发给模型。"
+    }
+   ]
+  },
+  {
+   "name": "⑤ 部署",
+   "sub": "怎么让它跑起来：部署形态与压缩",
+   "terms": [
+    {
+     "name": "量化（Quantization）",
+     "plain": "把模型内部数字的精度调低（比如 16 位压到 4 位），体积和显存变小、速度变快，质量略有损失。",
+     "analogy": "把无损音乐转成 MP3，文件小一大半，日常听不出差别，发烧友能听出细节。",
+     "encounter": "想在笔记本、手机上跑大模型，下载的常是 4bit 量化版。",
+     "use": "AI 要把模型塞进手机、显卡不够用时，用它压缩模型体积。"
+    },
+    {
+     "name": "私有化部署（On-Premise Deployment）",
+     "plain": "把 AI 模型安装到公司自己的机房里，数据不出门，不给外部云服务商。",
+     "analogy": "像别人送餐上门和自己在家做饭：麻烦些，但食材和厨房全在自己掌控中。",
+     "encounter": "银行、医院、政府单位，涉及客户隐私或涉密资料时，常要求\"必须私有化\"。",
+     "use": "公司数据不能出门时，AI 装在自己服务器上用。"
+    },
+    {
+     "name": "端侧模型（On-Device Model）",
+     "plain": "把压缩后的小模型直接装进手机、车机、摄像头里，不用联网也能运行。",
+     "analogy": "像随身带的计算器，不用连网、不怕断线，按一下就有结果。",
+     "encounter": "手机相册自动识别人脸、录音转文字、车载语音助手，还有网络差的地下室。",
+     "use": "手机、汽车、摄像头要离线跑 AI 时用它。"
+    }
+   ]
+  },
+  {
+   "name": "⑥ 产品",
+   "sub": "能拿来做什么：应用与多模态",
+   "terms": [
+    {
+     "name": "RAG（Retrieval-Augmented Generation，检索增强生成）",
+     "plain": "让 AI 在回答前先去查一遍资料，把查到的内容放进上下文，再开口回答。",
+     "analogy": "开卷考试。模型记忆有限、可能记错；允许它翻书再答题，准确率就高很多。",
+     "encounter": "问\"我们公司年假怎么算\"、客服机器人查订单政策，背后基本都靠 RAG。",
+     "use": "AI 回答前先查资料再答，减少幻觉时用它。"
+    },
+    {
+     "name": "Agent（智能体）",
+     "plain": "不只回答一句话，还能自己拆解任务、调用工具、一步步执行，直到得出结果。",
+     "analogy": "实习生。你说\"整理上周销售数据出份周报\"，他自己找数据、算、写，不用你教每一步。",
+     "encounter": "让它自动查资料写调研、跑代码、订行程、跨系统搬数据时。它更需要人盯着。",
+     "use": "AI 要自己拆任务、调工具、多步完成一件事时用它。"
+    },
+    {
+     "name": "MCP（Model Context Protocol，模型上下文协议）",
+     "plain": "一套统一接口标准，让 AI 用同样方式连接各种外部工具和数据源，不必每接一个就重写一遍。",
+     "analogy": "USB-C 接口。以前每个设备一个专用口，现在一根线通用。",
+     "encounter": "给 AI 接数据库、本地文件、日历、公司内部系统时。工具方按 MCP 提供一次，多个 AI 应用都能用。",
+     "use": "让 AI 用统一方式接各种工具和数据源时用它。"
+    },
+    {
+     "name": "Chatbot（聊天机器人）",
+     "plain": "一个能跟你用文字或语音来回对话的程序，你问它答，答不上来就说\"抱歉没听懂\"。",
+     "analogy": "像银行大厅的咨询台，能回答常见问题；超出范围，它就把你转给人工。",
+     "encounter": "电商客服、银行 App、医院挂号页面右下角的小气泡。",
+     "use": "客服、陪伴、问答这类「对话产品」用 AI 时用它。"
+    },
+    {
+     "name": "Copilot（副驾驶式 AI 助手）",
+     "plain": "嵌在你正在用的软件里的 AI，不抢你的活，只在你手边递草稿、补一行、提个建议。",
+     "analogy": "像学车时的副驾驶，方向盘还在你手里，他负责提醒\"该打灯了\"。",
+     "encounter": "写代码的编辑器、写文档的 Word、做报表的表格软件，边打字边冒出的灰色补全文字就是。",
+     "use": "写代码、写文档时，AI 在旁边给建议、补全时用它。"
+    },
+    {
+     "name": "AI 搜索与深度研究（Deep Research）",
+     "plain": "AI 不只丢给你几条链接，而是自己翻几十上百个网页，读完写成一份带出处的报告。",
+     "analogy": "以前搜索引擎给你一堆书，现在它派了个助理读完再给你摘要。",
+     "encounter": "查行业资料、对比几款产品、写调研报告的时候。",
+     "use": "AI 要联网查资料、做调研报告时用它。"
+    },
+    {
+     "name": "多智能体（Multi-Agent）",
+     "plain": "不是一个 AI 单干，而是好几个 AI 分工、协作，甚至互相挑错。",
+     "analogy": "一个小团队，有人写方案、有人找漏洞、有人最后拍板。",
+     "encounter": "AI 编程工具里\"规划员、程序员、测试员\"配合干活，或客服系统分派工单。",
+     "use": "一个任务太大，让多个 AI 分工合作时用它。"
+    },
+    {
+     "name": "生成式 AI（Generative AI）",
+     "plain": "不只做判断，还能产出新内容——文字、图片、声音、代码都是\"生成\"出来的。",
+     "analogy": "以前的 AI 像阅卷老师，只打对错；生成式 AI 像会写作文的学生，能自己交稿。",
+     "encounter": "让 AI 写周报、写邮件、画插画、改简历、写代码，用的就是它。",
+     "use": "AI 要「创作」文字、图片、音乐、视频时用它。"
+    },
+    {
+     "name": "AIGC（AI Generated Content，人工智能生成内容）",
+     "plain": "指由 AI 生成的内容本身（文章、图片、视频等），也指这门生意。",
+     "analogy": "以前短视频是\"网友自己拍的\"，现在很多是\"机器做出来的\"，后者就叫 AIGC。",
+     "encounter": "看新闻发现配图是 AI 画的、听歌发现是人声合成、公司用 AI 批量出商品文案。",
+     "use": "批量生成文案、配图、短视频时用它。"
+    },
+    {
+     "name": "扩散模型（Diffusion Model）",
+     "plain": "先教 AI 把图片逐步加噪点变成糊图，再学会反过来把糊图还原成清晰图片；练成后，给它一张噪点图并说明画什么，它就能还原出图。",
+     "analogy": "像把一幅画反复复印到糊成一团，然后专门练\"倒放\"，练到能从糊团里画出清晰原画。",
+     "encounter": "用 Midjourney、Stable Diffusion 出图，用 AI 修图去噪，很多 AI 配音、AI 音乐背后也是同一套思路。",
+     "use": "AI 画图、生成视频时，靠它从噪声一步步「去噪」出画面。"
+    },
+    {
+     "name": "视频生成（Text-to-Video）",
+     "plain": "给它一段文字描述，它直接产出一段几秒钟的视频画面。",
+     "analogy": "像跟画师说戏：\"下雨的东京街头，女生撑红伞回头\"，他不用画分镜，直接演一段给你看。",
+     "encounter": "做广告素材、短视频找灵感、把产品图变成动态演示。它目前擅长几秒钟的镜头，长片还不靠谱。",
+     "use": "AI 要做广告片、动画、数字人视频时用它。"
+    },
+    {
+     "name": "语音识别（ASR，Automatic Speech Recognition）",
+     "plain": "把你说出来的话自动变成文字。",
+     "analogy": "像一个不休息的速记员，你说话它同步打字，还会自动补标点。",
+     "encounter": "微信语音转文字、看视频开自动字幕、开完会把录音转成纪要、喊智能音箱。",
+     "use": "AI 要把你说的话转成文字时用它（会议记录、语音助手）。"
+    },
+    {
+     "name": "语音合成（TTS，Text-to-Speech）",
+     "plain": "把文字念出来，而且能模仿音色、语气和停顿，听着像真人。",
+     "analogy": "像请了一位随叫随到的播音员，稿子给它，它立刻读，还能换成你喜欢的嗓音。",
+     "encounter": "地图导航播报、听书 App、短视频配音、银行客服电话、给视力不便的人读屏幕。",
+     "use": "AI 要把文字读出来、配旁白时用它。"
+    },
+    {
+     "name": "OCR（Optical Character Recognition，光学字符识别）",
+     "plain": "让电脑\"看懂\"图片里的字，并转成可以复制、可以搜索的文本。",
+     "analogy": "像给每张扫描件配了个抄写员，照着照片把字誊到文档里，连表格位置也摆好。",
+     "encounter": "拍发票报销、拍纸质合同存档、截图提取文字、身份证和车牌录入、老书电子化。",
+     "use": "AI 要读发票、合同、车牌、截图里的字时用它。"
+    },
+    {
+     "name": "具身智能（Embodied AI）",
+     "plain": "给 AI 配一副身体，让它能看、能走、能动手。",
+     "analogy": "一个背熟了菜谱的厨师，第一次真正站到灶台前炒菜。",
+     "encounter": "扫地机器人、仓库搬运机器人、人形机器人演示视频里。",
+     "use": "AI 要控制机器人、机械臂在真实世界干活时用它。"
+    },
+    {
+     "name": "世界模型（World Model）",
+     "plain": "AI 先在\"脑子\"里预演现实会怎么变化，再决定下一步动作。",
+     "analogy": "下棋高手落子前，先在脑中推演后面几步会怎样。",
+     "encounter": "自动驾驶预判行人走向、视频生成模型、机器人训练场景。",
+     "use": "AI 要在「脑内」模拟世界、预测下一步会怎样时用它。"
+    }
+   ]
+  },
+  {
+   "name": "⑦ 成本",
+   "sub": "要花多少钱：算力与计费",
+   "terms": [
+    {
+     "name": "GPU / 算力（GPU，Graphics Processing Unit，图形处理器）",
+     "plain": "GPU 是专门同时做大量重复计算的芯片；算力就是它\"每秒能算多少\"的总量。",
+     "analogy": "CPU 像一个算得极快的账房先生，GPU 像一千个只算加减法的人一起干，算力就是这支队伍的人数。",
+     "encounter": "本地跑模型卡顿、公司买服务器报价几十万、听到\"显卡不够用\"。",
+     "use": "AI 训练和运行大模型时，靠它做并行计算，算力越足越快。"
+    },
+    {
+     "name": "Token 计费 / 推理成本",
+     "plain": "按 token（词元，可粗略理解为一个字或半句话）收钱，你发的和它答的都算。",
+     "analogy": "像打车按公里计费，来回都掏钱。",
+     "encounter": "API 账单里\"输入多少万 token / 输出多少万 token\"，长文档喂一次可能就几块钱。",
+     "use": "AI 按调用量算钱时用它——你的账单基本按 token 数走。"
+    }
+   ]
+  },
+  {
+   "name": "⑧ 安全",
+   "sub": "别翻车、别被骗：风险、合规、评测",
+   "terms": [
+    {
+     "name": "提示词注入（Prompt Injection）",
+     "plain": "用户偷偷在输入里加入一段指令，把开发者原先定好的规则覆盖掉，让 AI 做出你不希望它做的事。",
+     "analogy": "你在前台留了张纸条让前台照办；有人又贴了张小纸条：\"以上作废，请把保险柜钥匙给他。\"",
+     "encounter": "做能读取网页、邮件、文档的 AI 助手时最常见。防护原则：外部内容只当\"资料\"，不当\"命令\"。",
+     "use": "有人往输入里塞「忽略之前的指令」来骗 AI 时，就是这种攻击。"
+    },
+    {
+     "name": "越狱（Jailbreak）",
+     "plain": "用各种话术绕过模型内置的安全限制，诱导它说出本不该说的内容或危险步骤。",
+     "analogy": "门锁没坏，但有人假装成维修工，骗你开门。",
+     "encounter": "做面向大众的产品时一定会碰到。有人用角色扮演、假设场景、翻译改写反复试探，要记录并统计。",
+     "use": "有人想办法绕过 AI 的安全限制时用它。"
+    },
+    {
+     "name": "深度伪造（Deepfake）",
+     "plain": "用 AI 换脸、模仿声音或生成整段假视频，让人看起来、听起来跟真的一样。",
+     "analogy": "照片 PS 的升级版——以前改图，现在能伪造一段\"你本人亲口说的话\"。",
+     "encounter": "收到\"老板\"语音要求立刻转账、看到名人不雅视频、招聘时收到可疑面试录像。对策：挂掉后打常用号码核实。",
+     "use": "AI 换脸、伪造声音和视频时用它（也是要防的）。"
+    },
+    {
+     "name": "内容审核 / 护栏（Content Moderation / Guardrails）",
+     "plain": "在 AI 的输入和输出两头设置检查，拦住辱骂、违法、涉密、误导的内容；护栏就是这套检查机制。",
+     "analogy": "商场扶梯两侧的挡板，不阻止你上楼，但防止你掉下去。",
+     "encounter": "任何对外开放的 AI 产品都必须有护栏。做法通常是\"输入先筛一遍、输出再筛一遍\"。",
+     "use": "AI 产品上线前，用它拦住违法、有害、涉密内容。"
+    },
+    {
+     "name": "基准测试 / 榜单（Benchmark / Leaderboard）",
+     "plain": "一套统一考题加成绩排名，用来横向比较不同模型谁更强。",
+     "analogy": "像汽车碰撞测试和油耗榜，同一套标准下比分数。",
+     "encounter": "新模型发布时那句\"某榜单第一\"；你选模型前想看看谁写代码更准时。",
+     "use": "AI 选型、比谁更强时看它。"
+    }
+   ]
+  }
+ ]
+};
+
+</script>
+<script>
+/* 3D 环形逻辑链 · 内容数据
+   外环：产业外链（8 环）  内环：运行内链（8 环）
+   每个节点：含义 / 为什么有这一步 / 例子 / 依据 / 结论 / 关系
+   link：与另一条环上节点的对应关系（用于 3D 连线）
+   innerDemo：内环 8 步的贯穿示例（同一句话走完全程）
+*/
+window.CHAIN3D = {
+  outer: {
+    id: "outer", name: "产业外链", color: "#38bdf8", radius: 330,
+    nodes: [
+      {
+        name: "数据", en: "Data",
+        meaning: "把世界上的文字、图片、对话，整理成「题目 + 答案」，是 AI 的原料。",
+        why: "没有「什么算对」的样本，模型就不知道要学什么。",
+        example: "把 1 万条客服对话标成「退货 / 物流 / 咨询」；手机相册要人脸分组，先得有人确认这两张脸是同一个人。",
+        evidence: "ImageNet 有 1400 多万张手工标注图片；InstructGPT 雇了约 40 名标注员整理 1.3 万条示范、3.3 万条偏好对比。",
+        conclusion: "没有答案，模型学不会——数据标注是在制造「什么算对」。",
+        relation: "它是内环第 ① 步「切块」的原料；数据质量决定模型上限——喂进去什么，它就学什么。",
+        link: 0
+      },
+      {
+        name: "训练", en: "Training",
+        meaning: "用样本反复调参数，让模型学会「输入 → 输出」。",
+        why: "参数一开始是乱的，必须靠大量例子一遍遍纠错，模型才有本事。",
+        example: "像学生刷题：做错 → 对答案 → 改思路，刷几百万道，手感就稳了。",
+        evidence: "规模定律：训练算力 ≈ 6 × 参数量 × token 数；GPT-3 有 1750 亿参数、训练用了 3000 亿 token。",
+        conclusion: "训练的本质，是用算力把数据压进参数。",
+        relation: "训练改的是内环第 ⑤ 步「深加工」里那些参数；训练越久，参数越会做事。",
+        link: 4
+      },
+      {
+        name: "模型", en: "Model",
+        meaning: "参数 + 结构，把学到的本事存成一份可复用、可调用的文件。",
+        why: "训练完得把参数存成一份文件，才能被反复调用、复制、部署。",
+        example: "手机里的离线翻译包，就是一个塞进设备里的小模型。",
+        evidence: "GPT-3 是 1750 亿参数；Qwen 等系列从手机能跑的小尺寸到服务器大尺寸都有。",
+        conclusion: "模型是资产，不是过程。",
+        relation: "模型 = 内环 ④ 找关系 + ⑤ 深加工里存下来的参数；调用它时，参数不再改变。",
+        link: 3
+      },
+      {
+        name: "调用", en: "Inference / API",
+        meaning: "把你的输入送进模型，跑一次计算，拿回结果。",
+        why: "用户要的是「马上回答」，不可能每次都重新训练，所以调用只是跑一遍。",
+        example: "像点外卖：你只写需求，中央厨房做菜；不用自己开厨房。",
+        evidence: "一次调用 ≈ 2 × 参数量 × token 次运算；按 token 计费，输出通常比输入贵。",
+        conclusion: "调用是「零售」：按次买算力。",
+        relation: "对应内环 ④ 找关系 → ⑦ 做选择的整段计算；每次调用都不改变参数。",
+        link: 5
+      },
+      {
+        name: "部署", en: "Deployment",
+        meaning: "把模型放进机房或云，稳定地服务很多人。",
+        why: "一个模型要同时服务成千上万人，需要机房、排队、缓存来扛住。",
+        example: "像餐厅后厨：灶台、排班、叫号系统，让一百个人同时吃上。",
+        evidence: "vLLM 让同卡吞吐提升 2~4 倍；13B 模型一个 2048 token 请求的 KV Cache 可占约 1.6GB 显存。",
+        conclusion: "部署决定「买多少算力」，运维决定「用得多好」。",
+        relation: "它承载内环 ⑧「接回去」的循环：同一套参数，同时服务很多人，才摊得起成本。",
+        link: 7
+      },
+      {
+        name: "产品", en: "Product",
+        meaning: "用户真正能用上的东西：App、客服、Copilot、Agent。",
+        why: "技术再强，用户只认「我能用的东西」；产品是价值兑现的出口。",
+        example: "银行 App 右下角的小气泡客服、写作软件里边打字边补全的灰色文字。",
+        evidence: "Gartner 调查：只有约 48% 的 AI 项目真正走到生产环境。",
+        conclusion: "产品是价值兑现的地方。",
+        relation: "把内环的输出包装成体验；用户的使用和反馈，又变成新的数据回到外环第 ① 步。",
+        link: null
+      },
+      {
+        name: "成本", en: "Cost",
+        meaning: "算力 + 人力 + 账单；训练是一次性巨款，调用是零钱。",
+        why: "算力和人力都要花钱，成本决定这件事能不能持续、卖多少钱。",
+        example: "像打车：训练 = 买车，调用 = 每次里程费；账单决定你打不打得起。",
+        evidence: "训练 ≈ 6N × D；推理 ≈ 2N × token；缓存命中更便宜。",
+        conclusion: "成本决定产品形态和定价。",
+        relation: "成本横穿全链：训练是一次性巨款，调用是每次的零钱；太贵就倒逼产品换小模型、砍功能。",
+        link: null
+      },
+      {
+        name: "安全", en: "Security & Compliance",
+        meaning: "合规、防坑、兜底：让用户敢用、监管放行、出事能止损。",
+        why: "AI 会犯错也会被利用，没有合规和兜底，用户不敢用、监管不放行。",
+        example: "像餐厅的卫生许可证和监控：不直接做菜，但决定你能不能开业。",
+        evidence: "中国《生成式人工智能服务管理暂行办法》第四条、第十四条、第十七条；欧盟 AI 法案按风险分级设定义务。",
+        conclusion: "安全合规是准生证 + 保险单。",
+        relation: "它横穿全链，不单独属于某一步；出事时会把问题带回「数据」和「训练」重新修。",
+        link: 6
+      }
+    ]
+  },
+
+  inner: {
+    id: "inner", name: "运行内链", color: "#2dd4bf", radius: 185,
+    nodes: [
+      {
+        name: "切块", en: "Tokenize",
+        meaning: "把文字切成一小块一小块（token），再查表换成数字编号；模型只认编号。",
+        why: "模型只认数字，不认汉字，所以先把文字换成编号。",
+        example: "「今天天气真」→ 今天 / 天气 / 真 → 编号（示意）[8832, 4517, 2063]。",
+        evidence: "分词器 Tokenizer；API 按 token 计费，上下文长度也按 token 算。",
+        conclusion: "一切的起点：先把世界变成数字。",
+        relation: "接收外环「数据」；把文字变成 token 编号，交给 ② 向量化。",
+        link: 0
+      },
+      {
+        name: "向量化", en: "Embedding",
+        meaning: "每个 token 变成一串数字（向量）；意思相近的 token，数字也相近。",
+        why: "编号本身没有含义，变成向量才能计算「像不像」。",
+        example: "「猫」和「猫咪」坐标很近；「猫」和「报销」很远。",
+        evidence: "嵌入 Embedding 是搜索、推荐、去重的第一步；语义搜索靠它。",
+        conclusion: "数字不只是编号，还带着「意思」。",
+        relation: "承接 ① 切块；把编号变成带意思的数字，给 ④ 找关系做准备。",
+        link: null
+      },
+      {
+        name: "排位置", en: "Positional Encoding",
+        meaning: "给每个 token 打上「你在第几位」的标记；不打标记就分不清语序。",
+        why: "同样的词换个顺序意思就变，必须知道谁在前谁在后。",
+        example: "「狗咬人」和「人咬狗」：token 一样，位置不同，意思相反。",
+        evidence: "位置编码 Positional Encoding；现在主流用旋转位置编码 RoPE。",
+        conclusion: "顺序也是信息。",
+        relation: "和 ② 向量化一起，组成模型看到的「输入」。",
+        link: null
+      },
+      {
+        name: "找关系", en: "Attention",
+        meaning: "每个词去看句子里的其他词，判断该重点关注谁，再按权重把信息取回来。",
+        why: "要理解一句话，就得知道每个词该看哪些词。",
+        example: "「小明把苹果给小红，因为她饿了」——「她」会把注意力压到「小红」。",
+        evidence: "QKV（查询/键/值）+ 多头注意力；模型能记住前文人名靠它。",
+        conclusion: "所谓理解，本质是算清词与词的关系。",
+        relation: "这是调用时最吃算力的一步；模型 = 注意力 + 参数。",
+        link: 2
+      },
+      {
+        name: "深加工", en: "FFN + Residual",
+        meaning: "把词与词的关系一层层加工，慢慢变成「接下来该说什么」。",
+        why: "光有关系不够，还要一层层把关系加工成「接下来该说什么」。",
+        example: "像流水线：先认笔画，再认字，再读懂句子，最后明白意思。",
+        evidence: "几十到上百层；模型的大部分参数集中在这里（前馈网络、残差连接、层归一化）。",
+        conclusion: "深度，就是把简单关系一层层叠成复杂理解。",
+        relation: "训练改的就是这里的参数（对应外环「训练」）；层数越多越吃算力。",
+        link: 1
+      },
+      {
+        name: "算概率", en: "Logits → Softmax",
+        meaning: "输出「每个候选词有多像」，而不是直接给唯一答案。",
+        why: "它不直接给答案，而是算出每个候选词有多像，再挑。",
+        example: "下一个词：好 40%、热 20%、不错 15%、冷 5%。",
+        evidence: "原始分数（logits）经 Softmax 变成概率。",
+        conclusion: "它算的是「像不像」，不是「对不对」——幻觉从这里开始。",
+        relation: "概率表交给 ⑦ 做选择；训练时拿它和标准答案对比，产生误差去改参数。",
+        link: 3
+      },
+      {
+        name: "做选择", en: "Sampling",
+        meaning: "从概率表里挑一个词，怎么挑由温度、top-k、top-p 决定。",
+        why: "同一个概率表，挑法不同，回答的稳定性和创意就不同。",
+        example: "温度低就点熟悉招牌菜，温度高就敢尝新菜。",
+        evidence: "采样策略 Sampling；API 的 temperature 参数就是它。",
+        conclusion: "创意和稳定，是在这一步调出来的。",
+        relation: "安全审核在这一步加闸门；挑出的词交给 ⑧ 接回去。",
+        link: 7
+      },
+      {
+        name: "接回去", en: "Autoregressive",
+        meaning: "挑出的词接在输入后面，回到第 ① 步，重复——直到说完。",
+        why: "一次只生成一个词，必须把它接回输入，才能接着生成下一个。",
+        example: "说一个字，就把它加进上下文，再说下一个。",
+        evidence: "自回归 Autoregressive + KV Cache；流式输出就是一圈一圈蹦出来的。",
+        conclusion: "生成不是一次写完，是一圈一圈转出来的。",
+        relation: "回到 ① 切块再转一圈，直到说完；流式输出就是一个词一个词蹦出来。",
+        link: 4
+      }
+    ]
+  },
+
+  /* 内环贯穿示例：同一句问题，走完 8 步 */
+  innerDemo: {
+    question: "今天天气怎么样？",
+    steps: [
+      "切块：今天 / 天气 / 怎么样 / ？ → 4 个 token，换成编号",
+      "向量化：每个 token 变成一串带意思的数字",
+      "排位置：给这 4 个块标上第 1、2、3、4 位",
+      "找关系：模型重点看「天气」和「怎么样」",
+      "深加工：一层层加工，得出「接下来该说什么」",
+      "算概率：不错 40% / 很好 30% / 有点冷 20%…",
+      "做选择：按温度挑中「不错」",
+      "接回去：把「不错」接回问题后面，再转一圈"
+    ],
+    result: "今天天气不错。"
+  },
+
+  /* 环上显示的小字（顺序） */
+  order: ["①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧"]
+};
+
+</script>
+<script>
+/* 3D 环形逻辑链 · 柔和蓝 + 流水动画 + 流水声 + 惯性旋转 */
+(function () {
+  "use strict";
+  var D = window.CHAIN3D;
+  var canvas = document.getElementById("sea");
+  var ctx = canvas.getContext("2d");
+  var panel = document.getElementById("panel");
+  var panelBody = document.getElementById("panelBody");
+
+  var COL = {
+    outer: [47, 127, 181],
+    inner: [31, 148, 140],
+    label: [15, 58, 85],
+    sel: [180, 83, 9]
+  };
+
+  /* ---------- 状态 ---------- */
+  var W = 0, H = 0, DPR = 1, cx = 0, cy = 0, isMobile = false;
+  var rotY = 0.35, rotX = 1.02, camDist = 1050, camDistTarget = 1050, FOV = 980;
+  var velY = 0, velX = 0;
+  var spin = true, focus = "all";
+  var guideActive = false, gIdx = 0, spinBeforeGuide = true;
+  var calm = false, reading = false, learnTab = "essence";
+  var readSet = {};
+  try {
+    JSON.parse(localStorage.getItem("aiReadTerms") || "[]").forEach(function (n) { readSet[n] = 1; });
+  } catch (e) {}
+  var selected = null, hovered = null;
+  var time = 0, bubbles = [];
+  var dragging = false, dragMoved = false, lastX = 0, lastY = 0, downX = 0, downY = 0;
+  var lastNodes = [];
+
+  var RINGS = [
+    { key: "outer", data: D.outer, nodeR: 20, dir: 1 },
+    { key: "inner", data: D.inner, nodeR: 15, dir: -1 }
+  ];
+
+  /* ---------- 名词行星：每个外环大环节 = 太阳，名词库里的词 = 行星 ---------- */
+  var SUN_NAMES = ["数据", "训练", "模型", "调用", "部署", "产品", "成本", "安全"];
+  // 给普通人的白话别名（点开节点时显示）
+  var ALIAS = {
+    "数据": "给 AI 准备教材",
+    "训练": "让 AI 刷题学会",
+    "模型": "学成的那个文件",
+    "调用": "让模型开始干活",
+    "部署": "把模型放到线上服务大家",
+    "产品": "用户真正能用的东西",
+    "成本": "这件事要花多少钱",
+    "安全": "别出事、别违规",
+    "切块": "把句子切成小块",
+    "向量化": "把词变成数字",
+    "排位置": "记住谁在前谁在后",
+    "找关系": "看词和词之间什么关系",
+    "深加工": "一层层想明白",
+    "算概率": "猜下一个词有多可能",
+    "做选择": "挑一个词",
+    "接回去": "把词接回去再猜"
+  };
+  // 每个太阳只有一条轨道（同一条路线），不同太阳的轨道平面倾斜不同
+  var SUN_ORBIT = SUN_NAMES.map(function (_, si) {
+    return {
+      rad: 56 + (si % 2) * 8,
+      incl: 0.16 + (si % 3) * 0.1,
+      phase: si * 0.8
+    };
+  });
+  var SATS = [];
+  var showSats = true;
+  var hoveredSat = null;
+  var satPulseUntil = 0;
+  if (window.NOUNS && window.NOUNS.stages) {
+    window.NOUNS.stages.forEach(function (st, si) {
+      var n = st.terms.length;
+      st.terms.forEach(function (t, i) {
+        SATS.push({
+          sun: si, term: t, stage: st,
+          ang: (i / n) * Math.PI * 2,          // 角度顺序 = 名词在该环节里的运行顺序
+          size: 3.5 + (i % 2) * 0.9,
+          dir: (si % 2 === 0 ? 1 : -1)
+        });
+      });
+    });
+  }
+
+  function sunPos3D(si) {
+    var a = nodeAngle(si);
+    return { x: Math.cos(a) * RINGS[0].data.radius, y: 0, z: Math.sin(a) * RINGS[0].data.radius };
+  }
+
+  /* ---------- 尺寸 ---------- */
+  function resize() {
+    var nW = window.innerWidth, nH = window.innerHeight;
+    var mobile = nW < 760 || ("ontouchstart" in window);
+    var nDPR = Math.min(mobile ? 1.5 : 2, window.devicePixelRatio || 1);
+    // 尺寸没变就直接返回：捏合缩放时 visualViewport 会疯狂触发 resize，避免重复重建背景
+    if (bgGrad && nW === W && nH === H && nDPR === DPR) {
+      syncTouchAction();
+      return;
+    }
+    isMobile = mobile;
+    DPR = nDPR;
+    W = nW; H = nH;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    canvas.style.width = W + "px"; canvas.style.height = H + "px";
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    cx = W / 2; cy = H * 0.54;
+    syncTouchAction();
+    // 窄屏自动拉远，保证两条环都看得见
+    if (W < 760) {
+      var fit = Math.round(1050 * 950 / Math.max(360, W));
+      if (camDist < fit) { camDist = fit; camDistTarget = fit; }
+    }
+    makeBg();
+    // 右上/右下角缩放按钮：用 left/top 定位，兼容部分手机浏览器
+    var zb = document.querySelector(".zoombar");
+    if (zb) {
+      zb.style.left = Math.max(12, W - 64) + "px";
+      zb.style.top = Math.max(90, H - 132) + "px";
+      zb.style.right = "auto";
+      zb.style.bottom = "auto";
+    }
+  }
+
+  var bgGrad = null, skyGlow = null, horizonGlow = null, sunGlow = null, centerBloom = null, vignette = null, raysGrad = null;
+  var spriteBlue = null, spriteGold = null, spriteSoft = null;
+  var particles = [];
+  var CLOUDS = [], ISLES = [], BIRDS = [], JELLY = [], ROCKS = null;
+
+  function makeScenery() {
+    var hy = H * 0.30;
+    // 云：几团慢慢飘的雾
+    CLOUDS = [];
+    for (var i = 0; i < 6; i++) {
+      CLOUDS.push({
+        x: Math.random() * W,
+        y: H * (0.05 + Math.random() * 0.15),
+        w: W * (0.16 + Math.random() * 0.2),
+        h: 12 + Math.random() * 16,
+        sp: 0.0015 + Math.random() * 0.0035,
+        a: 0.08 + Math.random() * 0.1
+      });
+    }
+    // 远山 / 岛屿剪影（两层，远淡近浓）
+    ISLES = [];
+    for (var layer = 0; layer < 2; layer++) {
+      var pts = [], amp = layer === 0 ? 8 : 18, base = layer === 0 ? 2 : 5;
+      for (var x = -30; x <= W + 30; x += 22) {
+        var h = amp * (0.55 + 0.45 * Math.sin(x * 0.0037 + layer * 2.3))
+          + Math.sin(x * 0.011 + layer * 1.7) * amp * 0.35
+          + Math.sin(x * 0.027 + layer) * 2.5;
+        pts.push({ x: x, y: hy + base - h });
+      }
+      ISLES.push({ pts: pts, layer: layer });
+    }
+    // 海鸥：天空里的几笔线
+    BIRDS = [];
+    for (var b = 0; b < 3; b++) {
+      BIRDS.push({ x: W * (0.55 + b * 0.12), y: H * (0.10 + b * 0.045), s: 5 + b * 2, ph: b * 1.9 });
+    }
+    // 水母：只放在画面两侧，不挡中间的环
+    JELLY = [];
+    if (W >= 620) {
+      for (var j = 0; j < 5; j++) {
+        var leftSide = j % 2 === 0;
+        JELLY.push({
+          x: leftSide ? W * (0.05 + Math.random() * 0.13) : W * (0.82 + Math.random() * 0.12),
+          y: H * (0.58 + Math.random() * 0.28),
+          s: 7 + Math.random() * 8,
+          ph: Math.random() * 6.28,
+          sp: 0.12 + Math.random() * 0.2,
+          a: 0.14 + Math.random() * 0.12
+        });
+      }
+    }
+    // 前景礁石 + 海草（左右两角，框住画面）
+    ROCKS = null;
+    if (W >= 560) {
+      ROCKS = {
+        left: [
+          { x: 0, y: H * 0.864 },
+          { x: W * 0.045, y: H * 0.846 },
+          { x: W * 0.09, y: H * 0.878 },
+          { x: W * 0.13, y: H * 0.93 },
+          { x: W * 0.16, y: H }
+        ],
+        right: [
+          { x: W, y: H * 0.872 },
+          { x: W * 0.955, y: H * 0.852 },
+          { x: W * 0.91, y: H * 0.886 },
+          { x: W * 0.87, y: H * 0.938 },
+          { x: W * 0.84, y: H }
+        ]
+      };
+    }
+  }
+
+  function drawClouds() {
+    for (var i = 0; i < CLOUDS.length; i++) {
+      var c = CLOUDS[i];
+      var cx0 = ((c.x + time * c.sp * W) % (W + c.w * 2)) - c.w;
+      ctx.fillStyle = "rgba(255,255,255," + c.a + ")";
+      ctx.beginPath();
+      ctx.ellipse(cx0, c.y, c.w * 0.5, c.h, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255," + (c.a * 0.7) + ")";
+      ctx.beginPath();
+      ctx.ellipse(cx0 - c.w * 0.22, c.y + c.h * 0.5, c.w * 0.3, c.h * 0.66, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawIslands() {
+    var hy = H * 0.30;
+    ISLES.forEach(function (isle) {
+      var pts = isle.pts;
+      var g = ctx.createLinearGradient(0, hy - 30, 0, hy + 14);
+      if (isle.layer === 0) {
+        g.addColorStop(0, "rgba(126,176,201,0.30)");
+        g.addColorStop(1, "rgba(126,176,201,0.02)");
+      } else {
+        g.addColorStop(0, "rgba(78,132,162,0.42)");
+        g.addColorStop(1, "rgba(78,132,162,0.04)");
+      }
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+      ctx.lineTo(W + 30, hy + 16);
+      ctx.lineTo(-30, hy + 16);
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+
+  function drawBirds() {
+    BIRDS.forEach(function (bd) {
+      var x = bd.x + Math.sin(time * 0.05 + bd.ph) * 18;
+      var y = bd.y + Math.sin(time * 0.11 + bd.ph) * 5;
+      ctx.strokeStyle = "rgba(40,90,120,0.34)";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(x - bd.s, y + 2);
+      ctx.quadraticCurveTo(x - bd.s * 0.5, y - bd.s * 0.55, x, y);
+      ctx.quadraticCurveTo(x + bd.s * 0.5, y - bd.s * 0.55, x + bd.s, y + 2);
+      ctx.stroke();
+    });
+  }
+
+  function drawBoat() {
+    var s = 1.7;
+    var x = W * 0.17 + Math.sin(time * 0.014) * W * 0.025;
+    var y = H * 0.30 + 9 + Math.sin(time * 0.35) * 1.4;
+    ctx.save();
+    ctx.strokeStyle = "rgba(30,70,95,0.55)";
+    ctx.fillStyle = "rgba(30,70,95,0.55)";
+    ctx.lineWidth = 1.3;
+    // 船身
+    ctx.beginPath();
+    ctx.moveTo(x - 8 * s, y);
+    ctx.quadraticCurveTo(x, y + 3.6 * s, x + 8 * s, y);
+    ctx.lineTo(x + 6 * s, y - 0.6 * s);
+    ctx.lineTo(x - 6 * s, y - 0.6 * s);
+    ctx.closePath();
+    ctx.fill();
+    // 桅杆
+    ctx.beginPath();
+    ctx.moveTo(x, y - 0.6 * s);
+    ctx.lineTo(x, y - 12 * s);
+    ctx.stroke();
+    // 帆
+    ctx.beginPath();
+    ctx.moveTo(x, y - 11.6 * s);
+    ctx.lineTo(x, y - 1.2 * s);
+    ctx.lineTo(x + 7 * s, y - 1.8 * s);
+    ctx.closePath();
+    ctx.fill();
+    // 倒影
+    ctx.globalAlpha = 0.28;
+    ctx.beginPath();
+    ctx.moveTo(x - 6 * s, y + 4 * s);
+    ctx.lineTo(x + 6 * s, y + 4 * s);
+    ctx.stroke();
+    // 尾波
+    ctx.globalAlpha = 0.22;
+    ctx.beginPath();
+    ctx.moveTo(x - 8 * s, y + 2 * s);
+    ctx.quadraticCurveTo(x - 16 * s, y + 3 * s, x - 24 * s, y + 2.4 * s);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawJelly() {
+    if (!JELLY.length || !spriteSoft) return;
+    JELLY.forEach(function (j) {
+      var y = j.y + Math.sin(time * j.sp + j.ph) * 9;
+      var x = j.x + Math.cos(time * j.sp * 0.7 + j.ph) * 5;
+      var a = j.a * (0.8 + 0.2 * Math.sin(time * 0.6 + j.ph));
+      ctx.globalAlpha = a;
+      ctx.drawImage(spriteSoft, x - j.s * 2.4, y - j.s * 2.4, j.s * 4.8, j.s * 4.8);
+      ctx.globalAlpha = 1;
+      // 伞盖（半透明填充 + 轮廓）
+      ctx.beginPath();
+      ctx.ellipse(x, y, j.s * 0.8, j.s * 0.62, 0, Math.PI, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(215,246,255," + (a * 0.7) + ")";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(230,252,255," + (a * 1.9) + ")";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // 触须
+      for (var t = 0; t < 3; t++) {
+        var tx = x - j.s * 0.5 + t * (j.s * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(tx, y + j.s * 0.55);
+        ctx.quadraticCurveTo(
+          tx + Math.sin(time * 0.7 + t) * 4, y + j.s * 1.5,
+          tx + Math.sin(time * 0.5 + t) * 3, y + j.s * 2.3
+        );
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawRocks() {
+    if (!ROCKS) return;
+    [ROCKS.left, ROCKS.right].forEach(function (pts, ri) {
+      var g = ctx.createLinearGradient(0, H * 0.83, 0, H);
+      g.addColorStop(0, "rgba(28,74,96,0.22)");
+      g.addColorStop(1, "rgba(8,34,50,0.58)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, H + 20);
+      pts.forEach(function (p, i) {
+        if (i === 0) ctx.lineTo(p.x, p.y);
+        else ctx.quadraticCurveTo(p.x, p.y, p.x, p.y);
+      });
+      ctx.lineTo(pts[pts.length - 1].x, H + 20);
+      ctx.closePath();
+      ctx.fill();
+      // 礁石边的高光
+      ctx.strokeStyle = "rgba(190,235,250,0.20)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y + 2); else ctx.quadraticCurveTo(p.x, p.y, p.x, p.y); });
+      ctx.stroke();
+    });
+    // 海草：几根会轻轻摆的水草
+    var baseX = [W * 0.055, W * 0.085, W * 0.115];
+    var baseXr = [W * 0.945, W * 0.915, W * 0.885];
+    [baseX, baseXr].forEach(function (arr, side) {
+      arr.forEach(function (bx, i) {
+        ctx.strokeStyle = "rgba(44,120,130,0.45)";
+        ctx.lineWidth = 2.2 - i * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(bx, H * 0.95);
+        ctx.quadraticCurveTo(
+          bx + Math.sin(time * 0.5 + i + side) * 12,
+          H * 0.89,
+          bx + Math.sin(time * 0.7 + i + side) * 20,
+          H * 0.83
+        );
+        ctx.stroke();
+      });
+    });
+  }
+
+  function makeSprite(rgb) {
+    var s = 96, c = document.createElement("canvas");
+    c.width = c.height = s;
+    var g = c.getContext("2d");
+    var gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, "rgba(255,255,255,0.96)");
+    gr.addColorStop(0.26, "rgba(" + rgb.join(",") + ",0.85)");
+    gr.addColorStop(0.60, "rgba(" + rgb.join(",") + ",0.22)");
+    gr.addColorStop(1, "rgba(" + rgb.join(",") + ",0)");
+    g.fillStyle = gr; g.fillRect(0, 0, s, s);
+    return c;
+  }
+
+  function makeSoftSprite() {
+    var s = 64, c = document.createElement("canvas");
+    c.width = c.height = s;
+    var g = c.getContext("2d");
+    var gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, "rgba(255,255,255,0.92)");
+    gr.addColorStop(0.32, "rgba(236,250,255,0.48)");
+    gr.addColorStop(1, "rgba(220,245,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, s, s);
+    return c;
+  }
+
+  function makeBg() {
+    // 面：天空 → 海水的整体渐变（学海无涯的“海”）
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, "#e9f8fe");
+    bgGrad.addColorStop(0.16, "#d8f1fb");
+    bgGrad.addColorStop(0.32, "#c3e8f6");
+    bgGrad.addColorStop(0.50, "#a4d7ea");
+    bgGrad.addColorStop(0.72, "#6fb0cf");
+    bgGrad.addColorStop(1, "#3f7fa6");
+    // 面：顶上天光
+    skyGlow = ctx.createRadialGradient(cx, H * 0.14, 20, cx, H * 0.14, Math.max(W, H) * 0.75);
+    skyGlow.addColorStop(0, "rgba(255,255,255,0.78)");
+    skyGlow.addColorStop(0.44, "rgba(255,255,255,0.22)");
+    skyGlow.addColorStop(1, "rgba(255,255,255,0)");
+    // 面：地平线暖光（治愈感的暖，与蓝色形成对比）
+    horizonGlow = ctx.createRadialGradient(cx, H * 0.30, 10, cx, H * 0.30, W * 0.46);
+    horizonGlow.addColorStop(0, "rgba(255,249,228,0.78)");
+    horizonGlow.addColorStop(0.38, "rgba(255,246,220,0.26)");
+    horizonGlow.addColorStop(1, "rgba(255,246,220,0)");
+    // 面：海平线上的暖日（冷暖对比，画面第二重心）
+    sunGlow = ctx.createRadialGradient(cx, H * 0.30 - 8, 6, cx, H * 0.30 - 8, Math.min(W, H) * 0.22);
+    sunGlow.addColorStop(0, "rgba(255,253,240,0.95)");
+    sunGlow.addColorStop(0.18, "rgba(255,246,214,0.55)");
+    sunGlow.addColorStop(0.55, "rgba(255,236,190,0.16)");
+    sunGlow.addColorStop(1, "rgba(255,236,190,0)");
+    // 面：中心光晕（把双环托起来，画面的重心）
+    centerBloom = ctx.createRadialGradient(cx, cy * 0.98, 30, cx, cy * 0.98, Math.max(W, H) * 0.56);
+    centerBloom.addColorStop(0, "rgba(255,252,242,0.58)");
+    centerBloom.addColorStop(0.32, "rgba(236,250,255,0.32)");
+    centerBloom.addColorStop(0.62, "rgba(210,240,255,0.10)");
+    centerBloom.addColorStop(1, "rgba(210,240,255,0)");
+    // 面：暗角（信息聚焦 / 画面分割）
+    vignette = ctx.createRadialGradient(cx, cy * 0.92, Math.min(W, H) * 0.24, cx, cy * 0.92, Math.max(W, H) * 0.78);
+    vignette.addColorStop(0, "rgba(10,45,70,0)");
+    vignette.addColorStop(0.66, "rgba(10,45,70,0.08)");
+    vignette.addColorStop(1, "rgba(10,45,70,0.38)");
+    // 线：光柱共用渐变
+    raysGrad = ctx.createLinearGradient(0, 0, 0, H * 0.95);
+    raysGrad.addColorStop(0, "rgba(255,253,244,0.5)");
+    raysGrad.addColorStop(0.5, "rgba(255,252,238,0.2)");
+    raysGrad.addColorStop(1, "rgba(255,250,235,0)");
+    spriteBlue = makeSprite(COL.outer);
+    spriteGold = makeSprite(COL.sel);
+    spriteSoft = makeSoftSprite();
+    makeParticles();
+    makeScenery();
+  }
+
+  function makeParticles() {
+    particles = [];
+    var n = Math.round((W * H) / (isMobile ? 52000 : 26000));
+    for (var i = 0; i < n; i++) {
+      var depth = 0.35 + Math.random() * 0.65;
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        depth: depth,
+        r: 1.2 + depth * 4.4,
+        sp: 1.6 + depth * 8,
+        amp: 8 + Math.random() * 26,
+        phase: Math.random() * Math.PI * 2,
+        a: (0.16 + Math.random() * 0.45) * (0.4 + depth * 0.6),
+        tw: 0.5 + Math.random() * 1.8
+      });
+    }
+  }
+
+  function wavePath(baseY, amp, freq, speed, k) {
+    ctx.beginPath();
+    for (var x = -30; x <= W + 30; x += 14) {
+      var y = baseY
+        + Math.sin(x * freq + time * speed + k * 1.7) * amp
+        + Math.sin(x * freq * 2.3 - time * speed * 0.6 + k) * amp * 0.35;
+      if (x <= -30) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  }
+
+  function drawOcean() {
+    // 面：天空 → 海水底色
+    ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = skyGlow; ctx.fillRect(0, 0, W, H);
+    drawClouds();
+
+    // 面：天空薄雾（重复-渐变，让上方不空）
+    var mistN = isMobile ? 2 : 4;
+    for (var m = 0; m < mistN; m++) {
+      var my = H * (0.055 + m * 0.052) + Math.sin(time * 0.07 + m * 1.3) * 7;
+      var mw = W * (0.42 + m * 0.12);
+      var mx = cx + Math.sin(m * 2.1 + time * 0.035) * W * 0.1;
+      var mg = ctx.createRadialGradient(mx, my, 8, mx, my, mw);
+      mg.addColorStop(0, "rgba(255,255,255," + (0.20 - m * 0.03) + ")");
+      mg.addColorStop(0.55, "rgba(255,255,255," + (0.07 - m * 0.012) + ")");
+      mg.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = mg;
+      ctx.fillRect(0, my - H * 0.075, W, H * 0.15);
+    }
+
+    // 线：地平线（信息分割，天空/海面）
+    var hy = H * 0.30;
+    ctx.strokeStyle = "rgba(255,255,255,0.34)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, hy); ctx.lineTo(W, hy); ctx.stroke();
+    // 面：地平线暖光 + 暖日
+    ctx.fillStyle = horizonGlow; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = sunGlow; ctx.fillRect(0, 0, W, H);
+
+    // 线 + 发散：光柱从上方汇聚，把视线引到画面中心
+    ctx.save();
+    ctx.fillStyle = raysGrad;
+    var apexX = cx + Math.sin(time * 0.05) * W * 0.018 + Math.sin(rotY) * W * 0.008;
+    for (var i = 0; i < 8; i++) {
+      var sway = Math.sin(time * 0.1 + i * 1.9) * 0.05;
+      var a0 = Math.PI / 2 + (i - 3.5) * 0.15 + sway;
+      var a1 = a0 - 0.065, a2 = a0 + 0.065;
+      ctx.globalAlpha = 0.7 + 0.3 * Math.sin(time * 0.08 + i * 1.3);
+      ctx.beginPath();
+      ctx.moveTo(apexX, -H * 0.15);
+      ctx.lineTo(apexX + Math.cos(a1) * H * 1.5, -H * 0.15 + Math.sin(a1) * H * 1.5);
+      ctx.lineTo(apexX + Math.cos(a2) * H * 1.5, -H * 0.15 + Math.sin(a2) * H * 1.5);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // 远景：岛屿剪影 + 海鸥
+    drawIslands();
+    drawBirds();
+
+    // 线 + 重复：远处海面细波（一层层退远）
+    for (var j = 0; j < 4; j++) {
+      var bY = hy + 16 + j * 15;
+      wavePath(bY, 2.2 + j * 1.6, 0.0055 + j * 0.0012, 0.35 + j * 0.08, j);
+      ctx.strokeStyle = "rgba(255,255,255," + (0.26 - j * 0.04) + ")";
+      ctx.lineWidth = 1.6 - j * 0.2;
+      ctx.stroke();
+    }
+
+    // 点：一条小船（学海无涯里的一叶小舟）
+    drawBoat();
+
+    // 点 + 肌理：水面碎光（阳光在海上洒出的碎金）
+    var glitterN = isMobile ? 16 : 26;
+    for (var s = 0; s < glitterN; s++) {
+      var t = (time * 0.03 + s * 0.137) % 1;
+      var sy = hy + 18 + (H * 0.46) * t;
+      var sx = (Math.sin(s * 12.9 + time * 0.18) * 0.5 + 0.5) * W + Math.sin(time * 0.3 + s) * 30;
+      var len = 22 + (s % 6) * 20;
+      var al = 0.12 * Math.sin(t * Math.PI);
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + len, sy + 5);
+      ctx.strokeStyle = "rgba(255,255,255," + al + ")";
+      ctx.lineWidth = 1.2; ctx.stroke();
+    }
+
+    // 点：阳光在水面的倒影光柱（竖向碎光，治愈感）
+    var reflectN = isMobile ? 14 : 22;
+    for (var r = 0; r < reflectN; r++) {
+      var ry = hy + 10 + r * (H * 0.021);
+      var rw = 12 + r * 5;
+      var rx = cx + Math.sin(r * 2.4 + time * 0.5) * (6 + r * 2.4);
+      var ra = Math.max(0, 0.16 - r * 0.006) * (0.7 + 0.3 * Math.sin(time * 0.9 + r));
+      ctx.beginPath(); ctx.moveTo(rx - rw / 2, ry); ctx.lineTo(rx + rw / 2, ry);
+      ctx.strokeStyle = "rgba(255,250,235," + ra + ")";
+      ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // 线 + 肌理：水面焦散光纹（一层层缓慢游动）
+    var causticN = isMobile ? 6 : 10;
+    ctx.save();
+    for (var c = 0; c < causticN; c++) {
+      var cy0 = hy + 96 + c * 24 + Math.sin(time * 0.22 + c * 1.7) * 5;
+      ctx.beginPath();
+      for (var qx = -20; qx <= W + 20; qx += 34) {
+        var qy = cy0 + Math.sin(qx * 0.012 + time * 0.45 + c) * 5
+          + Math.sin(qx * 0.031 - time * 0.3 + c * 2) * 3;
+        if (qx <= -20) ctx.moveTo(qx, qy); else ctx.lineTo(qx, qy);
+      }
+      ctx.strokeStyle = "rgba(255,255,255," + (0.055 + 0.02 * Math.sin(time * 0.4 + c)) + ")";
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 点：水母（两侧缓慢漂浮的微光）
+    drawJelly();
+
+    // 面：中心光晕（信息衬托 / 承载双环的“光之岛”），缓慢呼吸
+    ctx.globalAlpha = 0.82 + 0.18 * Math.sin(time * 0.32);
+    ctx.fillStyle = centerBloom; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+
+    // 面 + 线：近景海浪（重复-渐变，分割画面下缘）
+    var waveN = isMobile ? 2 : 3;
+    for (var w = 0; w < waveN; w++) {
+      var baseY = H * (0.82 + w * 0.06);
+      var amp = 7 + w * 9;
+      var freq = 0.0045 + w * 0.0018;
+      var speed = 0.5 - w * 0.08;
+      wavePath(baseY, amp, freq, speed, w + 2);
+      ctx.lineTo(W + 30, H + 30);
+      ctx.lineTo(-30, H + 30);
+      ctx.closePath();
+      var wg = ctx.createLinearGradient(0, baseY - amp * 2, 0, H);
+      wg.addColorStop(0, "rgba(255,255,255," + (0.20 - w * 0.02) + ")");
+      wg.addColorStop(0.35, "rgba(120,180,210," + (0.22 + w * 0.05) + ")");
+      wg.addColorStop(1, "rgba(30,84,118," + (0.36 + w * 0.08) + ")");
+      ctx.fillStyle = wg;
+      ctx.fill();
+      wavePath(baseY, amp, freq, speed, w + 2);
+      ctx.strokeStyle = "rgba(255,255,255," + (0.36 - w * 0.05) + ")";
+      ctx.lineWidth = 2.2 - w * 0.3;
+      ctx.stroke();
+    }
+
+    // 面 + 线：前景礁石和海草，框住画面下缘
+    drawRocks();
+
+    // 点：漂浮微光（景深视差，像海里的浮游光点）
+    for (var p = 0; p < particles.length; p++) {
+      var pp = particles[p];
+      var py = H - ((pp.y + time * pp.sp * 8) % (H + 100));
+      var px = pp.x + Math.sin(time * 0.22 + pp.phase) * pp.amp;
+      var tw = 0.55 + 0.45 * Math.sin(time * pp.tw + pp.phase);
+      var size = pp.r * 6;
+      ctx.globalAlpha = pp.a * tw;
+      ctx.drawImage(spriteSoft, px - size / 2, py - size / 2, size, size);
+    }
+    ctx.globalAlpha = 1;
+
+    // 面：暗角（信息聚焦；让四周安静下来，中间更亮）
+    ctx.fillStyle = vignette; ctx.fillRect(0, 0, W, H);
+    // 阅读模式：抬头看字时，背景自动降亮
+    if (reading) {
+      ctx.fillStyle = "rgba(246,252,255,0.38)";
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  /* ---------- 3D 投影 ---------- */
+  function project(x, y, z) {
+    var cyy = Math.cos(rotY), syy = Math.sin(rotY);
+    var x1 = x * cyy + z * syy;
+    var z1 = -x * syy + z * cyy;
+    var cxx = Math.cos(rotX), sxx = Math.sin(rotX);
+    var y2 = y * cxx - z1 * sxx;
+    var z2 = y * sxx + z1 * cxx;
+    var depth = z2 + camDist;
+    if (depth < 60) depth = 60;
+    var k = FOV / depth;
+    return { x: cx + x1 * k, y: cy + y2 * k, depth: depth, k: k };
+  }
+  function ringPoint(radius, angle) {
+    return { x: Math.cos(angle) * radius, y: 0, z: Math.sin(angle) * radius };
+  }
+  function nodeAngle(i) { return -Math.PI / 2 + i * Math.PI / 4; }
+
+  /* ---------- 环 ---------- */
+  function ringAlpha(key) { return focus === "all" ? 1 : (focus === key ? 1 : 0.14); }
+  function ringRGB(ring) { return ring.key === "outer" ? COL.outer : COL.inner; }
+
+  function drawRingLine(ring) {
+    var alpha = ringAlpha(ring.key);
+    if (alpha <= 0.05) return;
+    var pts = [], N = 128;
+    for (var i = 0; i <= N; i++) {
+      var a = (i / N) * Math.PI * 2;
+      var p = ringPoint(ring.data.radius, a);
+      pts.push(project(p.x, p.y, p.z));
+    }
+    var rgb = ringRGB(ring);
+    ctx.save();
+    ctx.beginPath();
+    pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(" + rgb.join(",") + "," + (0.42 * alpha) + ")";
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = "rgba(" + rgb.join(",") + ",0.5)";
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+
+    // 方向箭头
+    for (var k = 0; k < 8; k++) {
+      var a1 = nodeAngle(k) + Math.PI / 8 * 0.55;
+      var a2 = a1 + Math.PI / 8 * 0.18 * ring.dir;
+      var s1 = project(ringPoint(ring.data.radius, a1).x, 0, ringPoint(ring.data.radius, a1).z);
+      var s2 = project(ringPoint(ring.data.radius, a2).x, 0, ringPoint(ring.data.radius, a2).z);
+      var ang = Math.atan2(s2.y - s1.y, s2.x - s1.x);
+      ctx.save(); ctx.translate(s2.x, s2.y); ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-7, 4); ctx.lineTo(-7, -4);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(" + rgb.join(",") + "," + (0.55 * alpha) + ")";
+      ctx.fill(); ctx.restore();
+    }
+  }
+
+  /* ---------- 内外链对应关系 ---------- */
+  function nodeScreen(ring, i) {
+    var p = ringPoint(ring.data.radius, nodeAngle(i));
+    return project(p.x, p.y, p.z);
+  }
+
+  function drawFaintLinks() {
+    var outer = RINGS[0], inner = RINGS[1];
+    ctx.save();
+    ctx.setLineDash([3, 7]);
+    ctx.lineWidth = 1;
+    outer.data.nodes.forEach(function (n, i) {
+      if (n.link === null || n.link === undefined) return;
+      var a = nodeScreen(outer, i), b = nodeScreen(inner, n.link);
+      ctx.strokeStyle = "rgba(47,127,181,0.22)";
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.quadraticCurveTo((a.x + b.x) / 2 + 14, (a.y + b.y) / 2 - 14, b.x, b.y);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawCrossLink() {
+    if (!selected || !selected.node || selected.node.link === null || selected.node.link === undefined) return;
+    var fromRing = RINGS.filter(function (r) { return r.key === selected.ring; })[0];
+    var toKey = selected.ring === "outer" ? "inner" : "outer";
+    var toRing = RINGS.filter(function (r) { return r.key === toKey; })[0];
+    var a = nodeScreen(fromRing, selected.idx);
+    var b = nodeScreen(toRing, selected.node.link);
+    ctx.save();
+    ctx.setLineDash([6, 6]);
+    ctx.strokeStyle = "rgba(180,83,9,0.72)";
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = "rgba(180,83,9,0.4)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.quadraticCurveTo((a.x + b.x) / 2 + 20, (a.y + b.y) / 2 - 20, b.x, b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- 节点 ---------- */
+  function drawNode(ring, i, s) {
+    var n = ring.data.nodes[i];
+    var alpha = ringAlpha(ring.key);
+    var isSel = selected && selected.ring === ring.key && selected.idx === i;
+    var isHov = hovered && hovered.ring === ring.key && hovered.idx === i;
+    var isLinkTo = selected && selected.ring !== ring.key && selected.node && selected.node.link === i;
+
+    var depthT = Math.max(0, Math.min(1, 1 - (s.depth - camDist * 0.62) / (camDist * 0.85)));
+    var a = (0.42 + 0.58 * depthT) * alpha;
+    var r = ring.nodeR * s.k * (isSel ? 1.34 : isHov ? 1.14 : 1);
+    r = Math.max(4, r);
+
+    var base = isSel ? COL.sel : ringRGB(ring);
+
+    // 外发光
+    var glowR = r * (isSel ? 3.4 : 2.7);
+    var g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+    g.addColorStop(0, "rgba(" + base.join(",") + "," + (0.5 * a) + ")");
+    g.addColorStop(0.45, "rgba(" + base.join(",") + "," + (0.18 * a) + ")");
+    g.addColorStop(1, "rgba(" + base.join(",") + ",0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2); ctx.fill();
+
+    // 球体
+    var sg = ctx.createRadialGradient(s.x - r * 0.35, s.y - r * 0.4, r * 0.12, s.x, s.y, r);
+    sg.addColorStop(0, "rgba(255,255,255," + a + ")");
+    sg.addColorStop(0.42, "rgba(" + base.join(",") + "," + a + ")");
+    sg.addColorStop(1, "rgba(" + (isSel ? "120,53,15" : (ring.key === "outer" ? "20,70,105" : "13,84,78")) + "," + a + ")");
+    ctx.fillStyle = sg;
+    ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.fill();
+
+    ctx.strokeStyle = "rgba(255,255,255," + (0.85 * a) + ")";
+    ctx.lineWidth = Math.max(0.7, 1.3 * s.k);
+    ctx.stroke();
+
+    // 高光
+    ctx.beginPath();
+    ctx.ellipse(s.x - r * 0.32, s.y - r * 0.38, r * 0.3, r * 0.18, -0.6, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255," + (0.75 * a) + ")";
+    ctx.fill();
+
+    // 序号直接标在大球上
+    var numFs = Math.max(10, 13.5 * s.k);
+    ctx.font = "800 " + numFs + "px 'Microsoft YaHei',sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(8,34,52," + (0.35 * a) + ")";
+    ctx.strokeText(D.order[i], s.x, s.y);
+    ctx.fillStyle = "rgba(255,255,255," + Math.min(1, a + 0.2) + ")";
+    ctx.fillText(D.order[i], s.x, s.y + 0.5);
+
+    if (isSel) {
+      var pulse = 0.5 + 0.5 * Math.sin(time * 4);
+      ctx.beginPath(); ctx.arc(s.x, s.y, r + 5 + pulse * 5, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(180,83,9," + (0.35 + 0.4 * pulse) + ")";
+      ctx.lineWidth = 1.5; ctx.stroke();
+    }
+    if (isLinkTo) {
+      ctx.beginPath(); ctx.arc(s.x, s.y, r + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(180,83,9,0.7)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // 标签：沿径向外放
+    var c0 = project(0, 0, 0);
+    var dx = s.x - c0.x, dy = s.y - c0.y;
+    var len = Math.hypot(dx, dy) || 1;
+    var off = r + 16 * Math.max(0.75, s.k);
+    var tx = s.x + (dx / len) * off, ty = s.y + (dy / len) * off;
+    var fs = Math.max(11, 15 * s.k);
+
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = "700 " + fs + "px 'Microsoft YaHei',sans-serif";
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(255,255,255," + (0.95 * Math.max(alpha, 0.55)) + ")";
+    ctx.strokeText(n.name, tx, ty);
+    ctx.fillStyle = isSel
+      ? "rgba(180,83,9," + Math.max(0.8, a) + ")"
+      : "rgba(" + COL.label.join(",") + "," + Math.max(0.62, a) + ")";
+    ctx.fillText(n.name, tx, ty);
+
+    if (isSel || isHov) {
+      ctx.font = "400 " + Math.max(9, 10.5 * s.k) + "px 'Microsoft YaHei',sans-serif";
+      ctx.fillStyle = "rgba(79,127,156," + (0.95 * a) + ")";
+      ctx.fillText(n.en, tx, ty + 15 * Math.max(0.8, s.k));
+    }
+  }
+
+  /* ---------- 环上的标签：AI 产业链 / AI 思考链 ---------- */
+  function ringTopY(ring) {
+    var minY = 1e9;
+    for (var i = 0; i < 96; i++) {
+      var a = (i / 96) * Math.PI * 2;
+      var p = project(ring.data.radius * Math.cos(a), 0, ring.data.radius * Math.sin(a));
+      if (p.y < minY) minY = p.y;
+    }
+    return minY;
+  }
+
+  function roundRectPath(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function drawTag(text, centerX, y, rgb) {
+    ctx.font = "700 12.5px 'Microsoft YaHei',sans-serif";
+    var w = ctx.measureText(text).width + 42;
+    var h = 26;
+    var x = centerX - w / 2;
+    ctx.save();
+    roundRectPath(x, y - h / 2, w, h, 13);
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(" + rgb.join(",") + ",0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x + 14, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(" + rgb.join(",") + ",0.95)";
+    ctx.fill();
+    ctx.fillStyle = "rgba(15,58,85,0.92)";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x + 24, y + 1);
+    ctx.restore();
+  }
+
+  function drawRingTags() {
+    var yOuter = ringTopY(RINGS[0]) - 54;
+    var yInner = ringTopY(RINGS[1]) - 54;
+    if (yInner - yOuter < 34) yInner = yOuter + 34;
+    drawTag("外环 · AI 产业链", cx, yOuter, COL.outer);
+    drawTag("内环 · AI 思考链", cx, yInner, COL.inner);
+  }
+
+  /* ---------- 画名词行星 ---------- */
+  function shortLabel(name) {
+    var i = name.indexOf("（");
+    if (i > 0) {
+      var base = name.slice(0, i).trim();
+      if (base.length >= 2) return base;
+    }
+    return name.length > 8 ? name.slice(0, 7) + "…" : name;
+  }
+
+  function drawSatellites() {
+    if (!SATS.length) return;
+    var activeSun = -1;
+    if (selected && selected.ring === "outer") activeSun = selected.idx;
+    else if (hovered && hovered.ring === "outer") activeSun = hovered.idx;
+    var dimSun = (selected && selected.ring === "outer") ? selected.idx : -1;
+
+    // 每个太阳都画一条淡轨道；选中/悬停时加深——让“小球属于哪个大球”一眼可见
+    for (var soi = 0; soi < SUN_NAMES.length; soi++) {
+      var sunO = sunPos3D(soi);
+      var orbO = SUN_ORBIT[soi];
+      var isOn = soi === activeSun;
+      ctx.beginPath();
+      var orbitSteps = isMobile ? 28 : 48;
+      for (var ok = 0; ok <= orbitSteps; ok++) {
+        var oa = (ok / orbitSteps) * Math.PI * 2;
+        var oyy = Math.sin(oa + orbO.phase) * orbO.rad * orbO.incl;
+        var op = project(sunO.x + Math.cos(oa) * orbO.rad, oyy, sunO.z + Math.sin(oa) * orbO.rad);
+        if (ok === 0) ctx.moveTo(op.x, op.y); else ctx.lineTo(op.x, op.y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = isOn ? "rgba(47,127,181,0.30)" : "rgba(47,127,181,0.10)";
+      ctx.lineWidth = isOn ? 1.2 : 1;
+      ctx.setLineDash(isOn ? [3, 4] : [2, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // 行星位置（含轨道倾角的上下起伏）
+    var list = SATS.map(function (s) {
+      var sun = sunPos3D(s.sun);
+      var phi = s.ang + time * 0.34 * s.dir;
+      return { s: s, phi: phi, sun: sun };
+    });
+
+    // 拖尾光轨：先画，行星盖在上层
+    list.forEach(function (item) {
+      var s = item.s;
+      var on = (s.sun === activeSun) || (hoveredSat === s);
+      var cnt = on ? (isMobile ? 6 : 9) : (isMobile ? 3 : 4);
+      var step = on ? 0.085 : 0.06;
+      var baseA = on ? 0.5 : 0.16;
+      var orbT = SUN_ORBIT[s.sun];
+      for (var k = cnt; k >= 1; k--) {
+        var ph = item.phi - s.dir * step * k;
+        var yy = Math.sin(ph + orbT.phase) * orbT.rad * orbT.incl;
+        var p = project(item.sun.x + Math.cos(ph) * orbT.rad, yy, item.sun.z + Math.sin(ph) * orbT.rad);
+        var f = 1 - k / (cnt + 1);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(0.6, s.size * p.k * 1.1 * f), 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + COL.outer.join(",") + "," + (baseA * f) + ")";
+        ctx.fill();
+      }
+    });
+
+    var drawList = list.map(function (item) {
+      var s = item.s;
+      var orbP = SUN_ORBIT[s.sun];
+      var yy = Math.sin(item.phi + orbP.phase) * orbP.rad * orbP.incl;
+      var p = project(item.sun.x + Math.cos(item.phi) * orbP.rad, yy, item.sun.z + Math.sin(item.phi) * orbP.rad);
+      return { s: s, p: p };
+    });
+    drawList.sort(function (a, b) { return b.p.depth - a.p.depth; });
+
+    drawList.forEach(function (item) {
+      var s = item.s, p = item.p;
+      var on = (s.sun === activeSun) || (hoveredSat === s);
+      var dim = focus === "inner" ? 0.18 : (focus === "outer" ? 1 : 0.75);
+      if (dimSun >= 0 && s.sun !== dimSun) dim *= 0.45;
+      var depthA = Math.max(0, Math.min(1, 1 - (p.depth - camDist * 0.62) / (camDist * 0.85)));
+      var a = (0.45 + 0.55 * depthA) * dim * (on ? 1 : 0.85);
+      var r = Math.max(1.6, s.size * p.k * (on ? 1.35 : 1) * 1.6);
+
+      // 悬停时：从小球拉一条线到它所属的大球，并给大球加脉冲
+      if (hoveredSat === s) {
+        var sunH = sunPos3D(s.sun);
+        var pS = project(sunH.x, 0, sunH.z);
+        ctx.save();
+        ctx.setLineDash([3, 5]);
+        ctx.strokeStyle = "rgba(180,83,9,0.42)";
+        ctx.lineWidth = 1.1;
+        ctx.beginPath(); ctx.moveTo(pS.x, pS.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+        ctx.setLineDash([]);
+        var pr = 22 * pS.k;
+        ctx.beginPath(); ctx.arc(pS.x, pS.y, pr, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(180,83,9,0.45)";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      var spr = on ? spriteGold : spriteBlue;
+      if (!spr) return;
+      var ds = r * 7;
+      ctx.globalAlpha = Math.min(1, a + 0.12);
+      ctx.drawImage(spr, p.x - ds / 2, p.y - ds / 2, ds, ds);
+      ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255," + Math.min(1, a + 0.3) + ")";
+      ctx.fill();
+
+      // 引导后的可点击提示：脉冲光圈
+      if (time < satPulseUntil && !on) {
+        var pulseR = r * 2 + 3 + Math.sin(time * 3 + s.ang * 4) * 2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(3, pulseR), 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(47,127,181," + (0.18 + 0.14 * Math.sin(time * 3 + s.ang * 4)) + ")";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // 只有鼠标悬停某颗行星时才显示它的名字，避免标签糊在一起
+      if (hoveredSat === s) {
+        var fs = Math.max(10, 12.5 * p.k);
+        ctx.font = "700 " + fs + "px 'Microsoft YaHei',sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(255,255,255,0.94)";
+        var hovLabel = SUN_NAMES[s.sun] + " · " + shortLabel(s.term.name);
+        ctx.strokeText(hovLabel, p.x, p.y + r + 11);
+        ctx.fillStyle = "rgba(15,58,85,0.96)";
+        ctx.fillText(hovLabel, p.x, p.y + r + 11);
+      }
+
+      lastNodes.push({
+        kind: "sat", sat: s,
+        x: p.x, y: p.y,
+        r: Math.max(13, r * 4)
+      });
+    });
+  }
+
+  /* ---------- 环心标题：始终约束在内环里面，随缩放一起变大变小 ---------- */
+  function drawCenterTitle() {
+    var k = FOV / camDist;
+    var innerR = RINGS[1].data.radius * k;
+    if (innerR < 46) return;
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // 主标题
+    var fs = Math.min(42, innerR * 0.34);
+    ctx.font = "800 " + fs + "px 'Microsoft YaHei','微软雅黑',sans-serif";
+    if ("letterSpacing" in ctx) ctx.letterSpacing = (fs * 0.16) + "px";
+    ctx.lineWidth = Math.max(3, fs * 0.16);
+    ctx.strokeStyle = "rgba(255,255,255,0.92)";
+    ctx.strokeText("学海无涯", cx, cy - innerR * 0.10);
+    ctx.fillStyle = "#14506e";
+    ctx.fillText("学海无涯", cx, cy - innerR * 0.10);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+    // 副标题
+    var fs2 = Math.max(9, Math.min(13, innerR * 0.085));
+    ctx.font = "500 " + fs2 + "px 'Microsoft YaHei','微软雅黑',sans-serif";
+    ctx.fillStyle = "rgba(79,127,156,0.95)";
+    ctx.fillText("AI 是怎么跑起来的", cx, cy + innerR * 0.16);
+
+    // 海比喻：手机内环太小时隐藏，避免挤出环外
+    if (innerR >= 118) {
+      var fs3 = Math.max(9, Math.min(11.5, innerR * 0.07));
+      ctx.font = "400 " + fs3 + "px 'Microsoft YaHei','微软雅黑',sans-serif";
+      ctx.fillStyle = "rgba(79,127,156,0.78)";
+      ctx.fillText("外环 = 海岸线 · 内环 = 水流", cx, cy + innerR * 0.33);
+    }
+    ctx.restore();
+  }
+
+  /* ---------- 主循环 ---------- */
+  var pinching = false, lastDrawTs = 0;
+  function frame(ts) {
+    // 双指缩放时暂停重绘：把 CPU/GPU 全留给浏览器的页面缩放，手势更跟手
+    if (pinching) { requestAnimationFrame(frame); return; }
+    if (!calm) time = ts / 1000;
+    // 手机降帧：正常 50fps，页面放大时 30fps，减少发热和卡顿
+    if (isMobile) {
+      var lim = pageScale() > 1.02 ? 33 : 20;
+      if (ts - lastDrawTs < lim) { requestAnimationFrame(frame); return; }
+      lastDrawTs = ts;
+    }
+    // 镜头平滑推近 / 拉远
+    camDist += (camDistTarget - camDist) * 0.07;
+    camDist = Math.max(620, Math.min(2200, camDist));
+    if (!dragging) {
+      rotY += velY + (spin ? 0.0024 : 0);
+      rotX = Math.max(0.5, Math.min(1.42, rotX + velX));
+      velY *= 0.93; velX *= 0.9;
+      if (Math.abs(velY) < 0.00004) velY = 0;
+      if (Math.abs(velX) < 0.00004) velX = 0;
+    }
+
+    drawOcean();
+    drawCenterTitle();
+
+    var seq = [];
+    RINGS.forEach(function (ring) {
+      drawRingLine(ring);
+      for (var i = 0; i < ring.data.nodes.length; i++) {
+        seq.push({ ring: ring, idx: i, s: nodeScreen(ring, i) });
+      }
+    });
+    seq.sort(function (a, b) { return b.s.depth - a.s.depth; });
+
+    drawFaintLinks();
+    drawCrossLink();
+
+    lastNodes = [];
+    seq.forEach(function (item) {
+      drawNode(item.ring, item.idx, item.s);
+      lastNodes.push({
+        kind: "node",
+        ring: item.ring.key, idx: item.idx,
+        x: item.s.x, y: item.s.y,
+        r: Math.max(14, item.ring.nodeR * item.s.k + 10)
+      });
+    });
+
+    if (showSats) drawSatellites();
+
+    drawRingTags();
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- 交互 ---------- */
+  function hitTest(x, y) {
+    var best = null, bestD = 1e9;
+    lastNodes.forEach(function (n) {
+      var d = Math.hypot(n.x - x, n.y - y);
+      if (d < n.r && d < bestD) { bestD = d; best = n; }
+    });
+    return best;
+  }
+  function nodeOf(ringKey, idx) { return (ringKey === "outer" ? D.outer : D.inner).nodes[idx]; }
+
+  function field(label, value, cls) {
+    return '<div class="field ' + cls + '"><span class="k">' + label + '</span><div class="v">' + value + '</div></div>';
+  }
+
+  /* ---------- 名词库（按 AI 运行顺序） ---------- */
+  var nounsEl = document.getElementById("nouns");
+  var nounsBody = document.getElementById("nounsBody");
+  var nounsRendered = false;
+
+  function shortName(name) {
+    var i = name.indexOf("（");
+    if (i > 0) {
+      var base = name.slice(0, i).trim();
+      if (base.length >= 2) return base;
+    }
+    return name;
+  }
+
+  function findTerm(name) {
+    if (!window.NOUNS) return null;
+    for (var s = 0; s < NOUNS.stages.length; s++) {
+      var st = NOUNS.stages[s];
+      for (var i = 0; i < st.terms.length; i++) {
+        if (st.terms[i].name === name || st.terms[i].name.indexOf(name) >= 0) {
+          return { stage: st, term: st.terms[i] };
+        }
+      }
+    }
+    return null;
+  }
+
+  function stageIdxOfName(name) {
+    if (!window.NOUNS) return -1;
+    for (var s = 0; s < NOUNS.stages.length; s++) {
+      for (var i = 0; i < NOUNS.stages[s].terms.length; i++) {
+        if (NOUNS.stages[s].terms[i].name === name) return s;
+      }
+    }
+    return -1;
+  }
+
+  function renderNouns() {
+    if (nounsRendered || !nounsBody || !window.NOUNS) return;
+    nounsRendered = true;
+    var html = "";
+    NOUNS.stages.forEach(function (st) {
+      html += '<div class="stage"><h3>' + st.name + '</h3><div class="sub">' + st.sub + '</div><div class="chips">';
+      st.terms.forEach(function (t) {
+        html += '<button class="chip" data-name="' + encodeURIComponent(t.name) + '">' + shortName(t.name) + '</button>';
+      });
+      html += '</div></div>';
+    });
+    nounsBody.innerHTML = html;
+    nounsBody.addEventListener("click", function (e) {
+      var chip = e.target.closest ? e.target.closest(".chip") : null;
+      if (!chip) return;
+      var found = findTerm(decodeURIComponent(chip.dataset.name));
+      if (found) showTerm(found.term, found.stage.name, chip);
+    });
+  }
+
+  function showTerm(term, stageName, chip, tagText) {
+    markRead(term.name);
+    var html = '<span class="p-tag outer">' + (tagText || "名词 · 外环环节") + '</span>';
+    html += '<h2>' + term.name + '</h2>';
+    html += '<div class="en">' + stageName + '</div>';
+    var si = stageIdxOfName(term.name);
+    if (si >= 0) {
+      var stName = NOUNS.stages[si].name.replace(/^[①-⑧]\s*/, "");
+      html += '<div class="termstage">属于：外环 · ' + stName +
+        '<button class="stagebtn" id="toStage">看这一环 →</button></div>';
+    }
+    html += field("大白话", linkify(term.plain, term.name), "");
+    html += field("打个比方", linkify(term.analogy, term.name), "");
+    if (term.use) html += field("AI 什么时候用", linkify(term.use, term.name), "concl");
+    html += field("什么时候会遇到", linkify(term.encounter, term.name), "link");
+    panelBody.innerHTML = html;
+    panel.classList.add("show");
+    updateReading();
+    var toStageBtn = document.getElementById("toStage");
+    if (toStageBtn && si >= 0) {
+      toStageBtn.addEventListener("click", function () {
+        closeNouns();
+        selectNode("outer", si);
+      });
+    }
+    if (chip) {
+      var chips = document.querySelectorAll("#nouns .chip");
+      for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("sel", chips[i] === chip);
+    }
+  }
+
+  function openNouns() { renderNouns(); if (nounsEl) nounsEl.classList.add("show"); updateReading(); }
+  function closeNouns() { if (nounsEl) nounsEl.classList.remove("show"); updateReading(); }
+
+  /* ---------- 进门说明 ---------- */
+  var introEl = document.getElementById("intro");
+  function openIntro() { if (introEl) introEl.classList.add("show"); updateReading(); }
+  function closeIntro(save) {
+    if (introEl) introEl.classList.remove("show");
+    if (save !== false) { try { sessionStorage.setItem("aiChainIntroSeen", "1"); } catch (e) {} }
+    updateReading();
+  }
+
+  function selectNode(ringKey, idx) {
+    if (guideActive && gIdx === 1 && ringKey === "outer") { guideNext(); return; }
+    var node = nodeOf(ringKey, idx);
+    selected = { ring: ringKey, idx: idx, node: node };
+    camDistTarget = (ringKey === "outer") ? 820 : 1050;
+    var tag = ringKey === "outer" ? "外环 · AI 产业链" : "内环 · AI 思考链";
+    var tagCls = ringKey === "outer" ? "outer" : "inner";
+    var moreLabel = "展开更多：依据 / 结论 / 关系";
+    var html = '<span class="p-tag ' + tagCls + '">' + tag + '</span>';
+    html += '<h2>' + D.order[idx] + ' ' + node.name + '</h2>';
+    html += '<div class="en">' + node.en + '</div>';
+    html += '<div class="alias">大白话：' + (ALIAS[node.name] || "") + '</div>';
+    html += '<div class="life"><span class="k">生活例子</span><div class="v">' + linkify(node.example, node.name) + '</div></div>';
+    html += field("一句话含义", linkify(node.meaning, node.name), "");
+    html += field("为什么有这一步", linkify(node.why || "", node.name), "why");
+    if (ringKey === "inner" && D.innerDemo) {
+      html += '<div class="demo"><div class="dq">同一句话走完全程：' + D.innerDemo.question + '</div><ol>';
+      D.innerDemo.steps.forEach(function (s, si) {
+        html += '<li class="' + (si === idx ? "now" : "") + '">' + s + '</li>';
+      });
+      html += '</ol><div class="dr">结果：' + D.innerDemo.result + '</div></div>';
+    }
+    if (ringKey === "outer" && window.NOUNS && NOUNS.stages[idx]) {
+      var st = NOUNS.stages[idx];
+      html += '<div class="stagehint">这一环有 ' + st.terms.length + ' 个名词：点环上的小球，或点下面的词条 ↓</div>';
+      html += '<div class="field"><span class="k">本环节的名词 · ' + st.terms.length + ' 个（可点）</span><div class="termwrap">';
+      st.terms.forEach(function (t) {
+        html += '<button class="termchip" data-term="' + encodeURIComponent(t.name) + '">' + shortName(t.name) + '</button>';
+      });
+      html += '</div></div>';
+    }
+    html += '<button class="morebtn" id="moreBtn">' + moreLabel + ' ▾</button>';
+    html += '<div id="moreBox" style="display:none">';
+    html += field("依据", linkify(node.evidence, node.name), "");
+    html += field("结论", linkify(node.conclusion, node.name), "concl");
+    html += field("关系", linkify(node.relation, node.name), "link");
+    if (node.link !== null && node.link !== undefined) {
+      var otherKey = ringKey === "outer" ? "inner" : "outer";
+      var other = nodeOf(otherKey, node.link);
+      html += '<button class="relbtn" id="relBtn">查看对应节点：' + other.name + ' →</button>';
+    }
+    html += '</div>';
+    panelBody.innerHTML = html;
+    panel.classList.add("show");
+    panelBody.scrollTop = 0;
+    updateReading();
+    var moreBtn = document.getElementById("moreBtn");
+    if (moreBtn) moreBtn.addEventListener("click", function () {
+      var box = document.getElementById("moreBox");
+      var open = box.style.display !== "none";
+      box.style.display = open ? "none" : "block";
+      moreBtn.textContent = open ? (moreLabel + " ▾") : "收起 ▴";
+    });
+    panelBody.querySelectorAll(".termchip").forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var fnd = findTerm(decodeURIComponent(chip.dataset.term));
+        if (fnd) showTerm(fnd.term, "外环 · " + SUN_NAMES[idx], null, "名词 · " + SUN_NAMES[idx]);
+      });
+    });
+    var btn = document.getElementById("relBtn");
+    if (btn) btn.addEventListener("click", function () { selectNode(ringKey === "outer" ? "inner" : "outer", node.link); });
+  }
+  function closePanel() { panel.classList.remove("show"); selected = null; camDistTarget = 1050; updateReading(); }
+
+  canvas.addEventListener("mousedown", function (e) {
+    dragging = true; dragMoved = false;
+    lastX = downX = e.clientX; lastY = downY = e.clientY;
+    canvas.classList.add("grabbing");
+  });
+  window.addEventListener("mousemove", function (e) {
+    if (dragging) {
+      var dx = e.clientX - lastX, dy = e.clientY - lastY;
+      if (Math.abs(e.clientX - downX) + Math.abs(e.clientY - downY) > 5) dragMoved = true;
+      rotY += dx * 0.0055;
+      rotX = Math.max(0.5, Math.min(1.42, rotX - dy * 0.0035));
+      velY = dx * 0.0055 * 0.55;
+      velX = -dy * 0.0035 * 0.5;
+      lastX = e.clientX; lastY = e.clientY;
+    } else {
+      var hit = hitTest(e.clientX, e.clientY);
+      if (hit && hit.kind === "sat") {
+        hoveredSat = hit.sat;
+        hovered = null;
+        canvas.style.cursor = "pointer";
+      } else {
+        hoveredSat = null;
+        hovered = hit ? { ring: hit.ring, idx: hit.idx } : null;
+        canvas.style.cursor = hit ? "pointer" : "grab";
+      }
+    }
+  });
+  window.addEventListener("mouseup", function (e) {
+    if (dragging && !dragMoved) {
+      var hit = hitTest(e.clientX, e.clientY);
+      if (hit && hit.kind === "sat") {
+        selected = { ring: "outer", idx: hit.sat.sun, node: null };
+        camDistTarget = 820;
+        showTerm(hit.sat.term, "外环 · " + SUN_NAMES[hit.sat.sun], null, "名词 · " + SUN_NAMES[hit.sat.sun]);
+      } else if (hit) {
+        selectNode(hit.ring, hit.idx);
+      } else {
+        closePanel();
+      }
+    }
+    dragging = false;
+    canvas.classList.remove("grabbing");
+  });
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    camDist = Math.max(620, Math.min(2200, camDist + e.deltaY * 0.45));
+    camDistTarget = camDist;
+  }, { passive: false });
+
+  /* ---------- 手机触摸：100% 时单指旋转；双指交给浏览器缩放；放大后单指自由滑动 ---------- */
+  var touchCount = 0, touchMoved = false, lastTX = 0, lastTY = 0;
+  function pageScale() {
+    return (window.visualViewport && window.visualViewport.scale) ? window.visualViewport.scale : 1;
+  }
+  // 页面 100% 时：单指留给“转环”；页面被放大后：单指留给浏览器“滑页面”
+  function syncTouchAction() {
+    canvas.style.touchAction = pageScale() > 1.02 ? "auto" : "pinch-zoom";
+  }
+  function tapHandle(x, y) {
+    var hit = hitTest(x, y);
+    if (hit && hit.kind === "sat") {
+      selected = { ring: "outer", idx: hit.sat.sun, node: null };
+      camDistTarget = 820;
+      showTerm(hit.sat.term, "外环 · " + SUN_NAMES[hit.sat.sun], null, "名词 · " + SUN_NAMES[hit.sat.sun]);
+    } else if (hit) {
+      selectNode(hit.ring, hit.idx);
+    } else {
+      closePanel();
+    }
+  }
+  canvas.addEventListener("touchstart", function (e) {
+    syncTouchAction();
+    // 页面已被双指放大：把手势完全交给浏览器，单指可自由拖动画面
+    if (pageScale() > 1.02) { touchCount = 0; dragging = false; return; }
+    if (e.touches.length === 1) {
+      touchCount = 1; touchMoved = false; dragging = true;
+      lastTX = e.touches[0].clientX; lastTY = e.touches[0].clientY;
+      // 关键：在 touchstart 就声明“这个手势归我”，安卓微信才不会吞掉后续 touchmove
+      if (e.cancelable) e.preventDefault();
+    } else {
+      touchCount = 0; dragging = false;
+      pinching = true;
+    }
+  }, { passive: false });
+  canvas.addEventListener("touchmove", function (e) {
+    if (touchCount === 1 && e.touches.length === 1 && pageScale() <= 1.02) {
+      e.preventDefault();
+      var dx = e.touches[0].clientX - lastTX;
+      var dy = e.touches[0].clientY - lastTY;
+      if (Math.abs(dx) + Math.abs(dy) > 4) touchMoved = true;
+      rotY += dx * 0.0055;
+      rotX = Math.max(0.5, Math.min(1.42, rotX - dy * 0.0035));
+      velY = dx * 0.0055 * 0.55;
+      velX = -dy * 0.0035 * 0.5;
+      lastTX = e.touches[0].clientX; lastTY = e.touches[0].clientY;
+    }
+  }, { passive: false });
+  canvas.addEventListener("touchend", function (e) {
+    if (e.touches.length < 2) pinching = false;
+    if (touchCount === 1 && !touchMoved && e.changedTouches.length) {
+      tapHandle(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }
+    if (e.touches.length === 0) { touchCount = 0; dragging = false; }
+  });
+  canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  /* ---------- 流水声（Web Audio 合成，无外部文件） ---------- */
+  var audio = null, soundOn = false;
+
+  function buildAudio() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      var ac = new AC();
+      var len = Math.floor(ac.sampleRate * 2);
+      var buf = ac.createBuffer(1, len, ac.sampleRate);
+      var data = buf.getChannelData(0);
+      var last = 0;
+      for (var i = 0; i < len; i++) {
+        var white = Math.random() * 2 - 1;
+        last = last * 0.975 + white * 0.025;   // 偏低频，像水流
+        data[i] = last * 3.2;
+      }
+      var src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+      var src2 = ac.createBufferSource(); src2.buffer = buf; src2.loop = true;
+
+      var hp = ac.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 140;
+      var lp = ac.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1050; lp.Q.value = 0.7;
+      var main = ac.createGain(); main.gain.value = 0;
+      src.connect(hp); hp.connect(lp); lp.connect(main); main.connect(ac.destination);
+
+      // 第二层：高频水花
+      var hp2 = ac.createBiquadFilter(); hp2.type = "highpass"; hp2.frequency.value = 2600;
+      var spark = ac.createGain(); spark.gain.value = 0;
+      src2.connect(hp2); hp2.connect(spark); spark.connect(ac.destination);
+
+      // 缓慢起伏：让水声像在流
+      var lfo = ac.createOscillator(); lfo.frequency.value = 0.11;
+      var lfoGain = ac.createGain(); lfoGain.gain.value = 320;
+      lfo.connect(lfoGain); lfoGain.connect(lp.frequency); lfo.start();
+
+      var lfo2 = ac.createOscillator(); lfo2.frequency.value = 0.07;
+      var lfo2Gain = ac.createGain(); lfo2Gain.gain.value = 0.025;
+      lfo2.connect(lfo2Gain); lfo2Gain.connect(spark.gain); lfo2.start();
+
+      src.start(); src2.start();
+      return { ac: ac, main: main, spark: spark };
+    } catch (err) { return null; }
+  }
+
+  function toggleSound() {
+    if (!audio) audio = buildAudio();
+    if (!audio) return;
+    if (audio.ac.state === "suspended") audio.ac.resume();
+    soundOn = !soundOn;
+    var t = audio.ac.currentTime;
+    audio.main.gain.cancelScheduledValues(t);
+    audio.main.gain.setTargetAtTime(soundOn ? 0.16 : 0.0001, t, 0.5);
+    audio.spark.gain.cancelScheduledValues(t);
+    audio.spark.gain.setTargetAtTime(soundOn ? 0.05 : 0.0001, t, 0.6);
+    var btn = document.getElementById("btnSound");
+    if (btn) {
+      btn.classList.toggle("active", soundOn);
+      btn.textContent = soundOn ? "流水声 · 开" : "流水声";
+    }
+  }
+
+  /* ---------- 术语互链 / 新手 10 词 / 学习卡 / 低动效 ---------- */
+  var TERM_LINKS = [];
+  (function buildTermLinks() {
+    if (!window.NOUNS) return;
+    NOUNS.stages.forEach(function (st) {
+      st.terms.forEach(function (t) {
+        var base = t.name.split("（")[0].trim();
+        if (base.length >= 2) TERM_LINKS.push([base, t.name]);
+      });
+    });
+    TERM_LINKS.push(["token", "Token 计费 / 推理成本"]);
+    TERM_LINKS.push(["Token", "Token 计费 / 推理成本"]);
+    TERM_LINKS.push(["参数", "参数量"]);
+    TERM_LINKS.push(["向量", "Embedding"]);
+    TERM_LINKS.push(["上下文", "长上下文"]);
+    TERM_LINKS.sort(function (a, b) { return b[0].length - a[0].length; });
+  })();
+
+  function linkify(text, selfName) {
+    if (!text || !TERM_LINKS.length) return text || "";
+    var out = text;
+    for (var i = 0; i < TERM_LINKS.length; i++) {
+      var key = TERM_LINKS[i][0], full = TERM_LINKS[i][1];
+      if (selfName && (full === selfName || key === selfName)) continue;
+      var idx = out.indexOf(key);
+      if (idx < 0) continue;
+      var ph = "\u0001" + i + "\u0001";
+      out = out.slice(0, idx) + ph + out.slice(idx + key.length);
+    }
+    TERM_LINKS.forEach(function (pair, i) {
+      var ph = "\u0001" + i + "\u0001";
+      if (out.indexOf(ph) >= 0) {
+        out = out.split(ph).join('<a class="term-link" data-term="' + encodeURIComponent(pair[1]) + '">' + pair[0] + '</a>');
+      }
+    });
+    return out;
+  }
+
+  function stageOfTermName(name) {
+    if (!window.NOUNS) return "";
+    for (var s = 0; s < NOUNS.stages.length; s++) {
+      for (var i = 0; i < NOUNS.stages[s].terms.length; i++) {
+        if (NOUNS.stages[s].terms[i].name === name) return NOUNS.stages[s].name;
+      }
+    }
+    return "";
+  }
+
+  var STARTER = [
+    "Token 计费 / 推理成本", "参数量", "大模型", "预训练", "微调",
+    "提示词", "温度", "幻觉", "RAG", "Agent"
+  ].map(function (n) { return n.split("（")[0].trim(); });
+  var starterRendered = false;
+
+  function markRead(name) {
+    var base = name.split("（")[0].trim();
+    readSet[base] = 1;
+    try { localStorage.setItem("aiReadTerms", JSON.stringify(Object.keys(readSet))); } catch (e) {}
+    updateStarter();
+  }
+
+  function updateStarter() {
+    var el = document.getElementById("starter");
+    if (!el) return;
+    var done = STARTER.filter(function (n) { return readSet[n]; }).length;
+    el.innerHTML = '<b>新手必看 10 词：</b>' +
+      STARTER.map(function (n) {
+        var base = n.split("（")[0];
+        return '<button class="schip' + (readSet[n] ? ' done' : '') + '" data-name="' + encodeURIComponent(n) + '">' +
+          (readSet[n] ? "✓ " : "") + base + '</button>';
+      }).join("") +
+      '<span class="scount">已学 ' + done + '/10</span>';
+  }
+
+  function renderStarter() {
+    if (starterRendered) return;
+    starterRendered = true;
+    updateStarter();
+    var el = document.getElementById("starter");
+    if (!el) return;
+    el.addEventListener("click", function (e) {
+      var chip = e.target.closest ? e.target.closest(".schip") : null;
+      if (!chip) return;
+      var f = findTerm(decodeURIComponent(chip.dataset.name));
+      if (f) showTerm(f.term, "外环 · " + stageOfTermName(f.term.name), null, "名词 · 外环环节");
+    });
+  }
+
+  var LEARN = {
+    essence: function () {
+      return '<p>先记住一句话：<b>AI 的工作，是看上文、猜下一个词；猜出来就接回去再猜，循环几十上百次，凑成一段回答。</b></p>' +
+        '<div class="big3">' +
+        '<div><b>外环 = 海岸线</b><span>数据 → 训练 → 模型 → 调用 → 部署 → 产品 → 成本 → 安全。这是 AI 产业怎么被造出来、卖出去、管起来。</span></div>' +
+        '<div><b>内环 = 水流</b><span>切块 → 向量化 → 排位置 → 找关系 → 深加工 → 算概率 → 做选择 → 接回去。这是 AI 每说一个词时内部走的 8 步。</span></div>' +
+        '<div><b>最关键的分水岭</b><span><b>训练</b>改参数，一次性巨款；<b>调用</b>不改参数，按次收费。所以 AI 不会越聊越聪明。</span></div>' +
+        '</div>' +
+        '<h3>把 AI 想成一片海</h3>' +
+        '<p>外环是海岸线（产业怎么走），内环是水流（每说一个词怎么转），名词库是海里的生物（64 个词）。这样看，整张图就是一回事。</p>' +
+        '<h3>看图的顺序</h3>' +
+        '<p>先看外环 8 个大球 → 再看内环 8 步 → 点任意内环节点，能看到「今天天气怎么样」这句话走完全程 → 最后去名词库查词。</p>';
+    },
+    diff: function () {
+      return '<p>新手最容易混淆的问题：<b>AI 是不是每次都在学习？</b>不是。训练和调用是两件完全不同的事。</p>' +
+        '<table><tr><th></th><th>训练（Training）</th><th>调用（Inference）</th></tr>' +
+        '<tr><td>做什么</td><td>用大量例子反复调参数</td><td>用现成参数跑一遍计算</td></tr>' +
+        '<tr><td>改参数吗</td><td><b>改</b></td><td><b>不改</b></td></tr>' +
+        '<tr><td>花多久</td><td>几小时到几个月</td><td>毫秒到几秒</td></tr>' +
+        '<tr><td>花多少钱</td><td>一次性巨款（几百万到上亿）</td><td>按次 / 按 token 收零钱</td></tr>' +
+        '<tr><td>得到什么</td><td>一个模型文件（参数）</td><td>一次回答</td></tr>' +
+        '<tr><td>谁来做</td><td>模型厂商 / 大公司</td><td>你的 App、客服、写作用具</td></tr></table>' +
+        '<h3>为什么这条重要</h3><p>理解了「调用不改参数」，你就明白：AI 不会因为你骂它就记仇，也不会因为你教它一次就永久学会——除非厂商重新训练或做记忆功能。</p>';
+    },
+    hallu: function () {
+      return '<h3>AI 为什么会一本正经地胡说？</h3>' +
+        '<p>因为它在「算概率」那一步，算的是 <b>“哪个词更像”</b>，不是 <b>“哪个词是对的”</b>。像，不等于真。</p>' +
+        '<div class="big3">' +
+        '<div><b>原因 1：它靠概率</b><span>“今天天气不错”在语料里很常见，它就更容易说出来，哪怕今天其实下暴雨。</span></div>' +
+        '<div><b>原因 2：它没有“查证”动作</b><span>模型内部只有参数，没有实时数据库，不知道你公司昨天发生了什么。</span></div>' +
+        '<div><b>原因 3：训练数据有错</b><span>网上抄错的、过时的、编造的内容，也会被学进去。</span></div>' +
+        '</div>' +
+        '<h3>怎么减少胡说</h3>' +
+        '<p>① 先查资料再回答（RAG）；② 让它给出处；③ 关键信息人工核对；④ 需要稳定时把温度调低；⑤ 不确定就让它说“不知道”。</p>' +
+        '<h3>一句话</h3><p>AI 是“很会接话的猜测机器”，不是“什么都知道的数据库”。</p>';
+    },
+    quiz: function () {
+      return '<div id="quizWrap"></div>';
+    }
+  };
+
+  var QUIZ = [
+    {
+      q: "AI 每次回答时，主要在做什么？",
+      opts: ["去数据库里查标准答案", "看上文、猜下一个词", "重新训练自己", "先联网搜索"],
+      ans: 1,
+      exp: "它做的是一遍遍「猜下一个词」，不是查库存。所以同一个问题，每次问都可能答得不一样。"
+    },
+    {
+      q: "训练和调用，最大的区别是什么？",
+      opts: ["训练要联网，调用不用", "训练改参数，调用不改参数", "调用比训练更贵", "两者没区别"],
+      ans: 1,
+      exp: "训练是改参数（一次性巨款），调用只是拿现成参数跑一遍（按次收费）。所以 AI 不会越聊越聪明。"
+    },
+    {
+      q: "AI 为什么会一本正经地胡说？",
+      opts: ["数据库里有错", "它算的是「像不像」，不是「对不对」", "有人故意教它说谎", "因为网速太慢"],
+      ans: 1,
+      exp: "概率高不等于事实对。幻觉从「算概率」这一步就埋下了，需要靠检索、核对来防。"
+    },
+    {
+      q: "下面哪个办法最能减少幻觉？",
+      opts: ["把温度调到最高", "先查资料再回答（RAG）", "同一个问题多问几遍", "换个大屏幕"],
+      ans: 1,
+      exp: "先检索再回答，让答案有出处，是目前最常用的减幻觉办法；降低温度只让它更保守，不解决“没依据”。"
+    },
+    {
+      q: "模型越大通常越强，但代价是什么？",
+      opts: ["不能离线使用", "算力和成本更高", "只能回答英文", "不能联网"],
+      ans: 1,
+      exp: "参数越多，训练和调用都更吃算力、更贵。所以才有小模型、量化、端侧模型这些方案。"
+    }
+  ];
+
+  var quizAnswered = {};
+
+  function renderQuiz() {
+    var wrap = document.getElementById("quizWrap");
+    if (!wrap) return;
+    var html = "";
+    QUIZ.forEach(function (item, qi) {
+      html += '<div class="qbox" data-q="' + qi + '"><h4>' + (qi + 1) + '. ' + item.q + '</h4><div class="qopts">';
+      item.opts.forEach(function (opt, oi) {
+        html += '<button class="qopt" data-q="' + qi + '" data-o="' + oi + '">' + opt + '</button>';
+      });
+      html += '</div><div class="qexp" id="qexp' + qi + '">' + item.exp + '</div></div>';
+    });
+    html += '<div class="sum"><b>一句话总结：</b>AI 不是数据库，也不是人；它是「看上文猜下一个词」的机器。猜得准，靠的是训练时把海量规律压进参数；猜得稳，靠的是调用时的检索、审核和你的核对。</div>';
+    wrap.innerHTML = html;
+    quizAnswered = {};
+    wrap.querySelectorAll(".qopt").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var qi = parseInt(btn.dataset.q, 10), oi = parseInt(btn.dataset.o, 10);
+        if (quizAnswered[qi]) return;
+        quizAnswered[qi] = true;
+        var box = btn.closest(".qbox");
+        var item = QUIZ[qi];
+        box.querySelectorAll(".qopt").forEach(function (b) {
+          var bi = parseInt(b.dataset.o, 10);
+          if (bi === item.ans) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+        });
+        var exp = document.getElementById("qexp" + qi);
+        if (exp) exp.classList.add("show");
+      });
+    });
+  }
+
+  var learnEl = document.getElementById("learn");
+  function openLearn(tab) {
+    if (tab) learnTab = tab;
+    if (!learnEl) return;
+    learnEl.classList.add("show");
+    renderLearn();
+    updateReading();
+  }
+  function closeLearn() {
+    if (!learnEl) return;
+    learnEl.classList.remove("show");
+    updateReading();
+  }
+  function renderLearn() {
+    var body = document.getElementById("learnBody");
+    if (!body) return;
+    body.innerHTML = (LEARN[learnTab] || LEARN.essence)();
+    if (learnTab === "quiz") renderQuiz();
+    document.querySelectorAll("#learn .ltab").forEach(function (t) {
+      t.classList.toggle("active", t.dataset.tab === learnTab);
+    });
+  }
+
+  function updateReading() {
+    var guide = document.getElementById("guide");
+    var intro = document.getElementById("intro");
+    reading = !!(
+      (panel && panel.classList.contains("show")) ||
+      (nounsEl && nounsEl.classList.contains("show")) ||
+      (learnEl && learnEl.classList.contains("show")) ||
+      (intro && intro.classList.contains("show")) ||
+      (guide && guide.classList.contains("show"))
+    );
+  }
+
+  /* ---------- 新手引导 ---------- */
+  var GUIDE_STEPS = [
+    {
+      title: "先看外面这条大环",
+      text: "这 8 个环节是 AI 从「数据」到「安全」的产业链——AI 怎么被造出来、怎么卖出去、怎么管起来。点任意大球看解释。"
+    },
+    {
+      title: "点一个大球试试",
+      text: "比如「数据」。它周围的小球，就是这一环里的名词，按运行顺序绕着转；点小球能看「大白话 / 打个比方」。"
+    },
+    {
+      title: "想按顺序查词？",
+      text: "点顶部「名词库」：64 个名词已经按外环顺序排好，想查哪个点哪个。引导结束，随便逛吧！"
+    }
+  ];
+
+  function guideRingRect() {
+    var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    for (var i = 0; i < 64; i++) {
+      var a = (i / 64) * Math.PI * 2;
+      var p = project(Math.cos(a) * RINGS[0].data.radius, 0, Math.sin(a) * RINGS[0].data.radius);
+      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+      minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+    }
+    return { x: minX - 26, y: minY - 26, w: maxX - minX + 52, h: maxY - minY + 52, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+  }
+
+  function guideNodeRect() {
+    var p = nodeScreen(RINGS[0], 0);
+    var k = FOV / camDist;
+    var r = RINGS[0].nodeR * k + 26;
+    return { x: p.x - r, y: p.y - r, w: r * 2, h: r * 2, cx: p.x, cy: p.y };
+  }
+
+  function guideButtonRect() {
+    var b = document.getElementById("btnNouns");
+    if (!b) return null;
+    var r = b.getBoundingClientRect();
+    return { x: r.left - 8, y: r.top - 8, w: r.width + 16, h: r.height + 16, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+  }
+
+  function renderGuide() {
+    if (!guideActive) return;
+    var spot = document.getElementById("spot");
+    var tip = document.getElementById("gtip");
+    var rect, radius;
+    if (gIdx === 0) { rect = guideRingRect(); radius = "50%"; }
+    else if (gIdx === 1) { rect = guideNodeRect(); radius = "50%"; }
+    else { rect = guideButtonRect() || { x: W / 2 - 100, y: 80, w: 200, h: 60, cx: W / 2, cy: 110 }; radius = "14px"; }
+
+    spot.style.left = rect.x + "px";
+    spot.style.top = rect.y + "px";
+    spot.style.width = rect.w + "px";
+    spot.style.height = rect.h + "px";
+    spot.style.borderRadius = radius;
+
+    document.getElementById("gstep").textContent = (gIdx + 1) + " / " + GUIDE_STEPS.length;
+    document.getElementById("gtitle").textContent = GUIDE_STEPS[gIdx].title;
+    document.getElementById("gtext").textContent = GUIDE_STEPS[gIdx].text;
+    document.getElementById("gprev").style.visibility = gIdx === 0 ? "hidden" : "visible";
+    document.getElementById("gnext").textContent = gIdx === GUIDE_STEPS.length - 1 ? "完成" : "下一步";
+
+    var tw = 330, th = 200;
+    var left, top;
+    if (gIdx === 2) {
+      // 顶栏按钮：优先放在按钮下方
+      left = Math.max(16, Math.min(W - tw - 16, rect.cx - tw / 2));
+      top = rect.y + rect.h + 16;
+      if (top + th > H - 16) top = Math.max(16, rect.y - th - 16);
+    } else {
+      // 大环 / 大球：放到侧边，避免挡住标题和中心
+      if (rect.x - tw - 20 >= 16) {
+        left = rect.x - tw - 20;
+      } else if (rect.x + rect.w + 20 + tw <= W - 16) {
+        left = rect.x + rect.w + 20;
+      } else {
+        left = 16;
+      }
+      top = Math.max(16, Math.min(H - th - 16, rect.cy - th / 2));
+    }
+    if (top < 16) top = 16;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+
+  function startGuide() {
+    guideActive = true;
+    gIdx = 0;
+    spinBeforeGuide = spin;
+    spin = false;
+    closePanel();
+    var g = document.getElementById("guide");
+    if (!g) return;
+    g.classList.add("show");
+    renderGuide();
+    updateReading();
+  }
+
+  function endGuide() {
+    guideActive = false;
+    var g = document.getElementById("guide");
+    if (g) g.classList.remove("show");
+    spin = spinBeforeGuide;
+    satPulseUntil = time + 9;
+    try { sessionStorage.setItem("aiGuideSeen", "1"); } catch (e) {}
+    updateReading();
+    showToast("✨ 大球周围的小球就是名词：点小球看解释，点大球看整条环。");
+  }
+
+  function guideNext() {
+    if (!guideActive) return;
+    if (gIdx >= GUIDE_STEPS.length - 1) { endGuide(); return; }
+    gIdx++;
+    renderGuide();
+  }
+  function guidePrev() { if (guideActive && gIdx > 0) { gIdx--; renderGuide(); } }
+
+  function showToast(msg, ms) {
+    var t = document.getElementById("toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function () { t.classList.remove("show"); }, ms || 7000);
+  }
+
+  /* ---------- 按钮（全部做空值保护，避免旧版 HTML 缓存导致整页报错） ---------- */
+  var btnSpin = document.getElementById("btnSpin");
+  if (btnSpin) btnSpin.addEventListener("click", function () {
+    spin = !spin; this.classList.toggle("active", spin);
+  });
+  var btnSound = document.getElementById("btnSound");
+  if (btnSound) btnSound.addEventListener("click", toggleSound);
+  var btnOuter = document.getElementById("btnOuter");
+  if (btnOuter) btnOuter.addEventListener("click", function () { focus = "outer"; setActive("btnOuter"); });
+  var btnInner = document.getElementById("btnInner");
+  if (btnInner) btnInner.addEventListener("click", function () { focus = "inner"; setActive("btnInner"); });
+  var btnAll = document.getElementById("btnAll");
+  if (btnAll) btnAll.addEventListener("click", function () { focus = "all"; setActive("btnAll"); });
+  var btnReset = document.getElementById("btnReset");
+  if (btnReset) btnReset.addEventListener("click", function () {
+    rotY = 0.35; rotX = 1.02; camDist = 1050; camDistTarget = 1050; velY = velX = 0; closePanel();
+  });
+  var panelClose = document.getElementById("panelClose");
+  if (panelClose) panelClose.addEventListener("click", closePanel);
+  var btnNouns = document.getElementById("btnNouns");
+  if (btnNouns) btnNouns.addEventListener("click", function () { if (guideActive) endGuide(); openNouns(); });
+  var gNextBtn = document.getElementById("gnext");
+  if (gNextBtn) gNextBtn.addEventListener("click", guideNext);
+  var gPrevBtn = document.getElementById("gprev");
+  if (gPrevBtn) gPrevBtn.addEventListener("click", guidePrev);
+  var gSkipBtn = document.getElementById("gskip");
+  if (gSkipBtn) gSkipBtn.addEventListener("click", function () { endGuide(); });
+  var btnSat = document.getElementById("btnSat");
+  if (btnSat) btnSat.addEventListener("click", function () {
+    showSats = !showSats;
+    btnSat.classList.toggle("active", showSats);
+  });
+  function zoomStep(f) {
+    camDistTarget = Math.max(620, Math.min(2200, (camDistTarget || camDist) * f));
+  }
+  var zoomInBtn = document.getElementById("zoomIn");
+  if (zoomInBtn) zoomInBtn.addEventListener("click", function () { zoomStep(0.82); });
+  var zoomOutBtn = document.getElementById("zoomOut");
+  if (zoomOutBtn) zoomOutBtn.addEventListener("click", function () { zoomStep(1.22); });
+  var zoomInMenu = document.getElementById("zoomInMenu");
+  if (zoomInMenu) zoomInMenu.addEventListener("click", function () { zoomStep(0.82); });
+  var zoomOutMenu = document.getElementById("zoomOutMenu");
+  if (zoomOutMenu) zoomOutMenu.addEventListener("click", function () { zoomStep(1.22); });
+  var rotateLeftBtn = document.getElementById("rotateLeft");
+  if (rotateLeftBtn) rotateLeftBtn.addEventListener("click", function () { rotY -= 0.32; velY = 0; });
+  var rotateRightBtn = document.getElementById("rotateRight");
+  if (rotateRightBtn) rotateRightBtn.addEventListener("click", function () { rotY += 0.32; velY = 0; });
+  var nounsClose = document.getElementById("nounsClose");
+  if (nounsClose) nounsClose.addEventListener("click", closeNouns);
+  var btnIntro = document.getElementById("btnIntro");
+  if (btnIntro) btnIntro.addEventListener("click", openIntro);
+  var btnLearn = document.getElementById("btnLearn");
+  if (btnLearn) btnLearn.addEventListener("click", function () { openLearn(); });
+  var learnCloseBtn = document.getElementById("learnClose");
+  if (learnCloseBtn) learnCloseBtn.addEventListener("click", closeLearn);
+  if (learnEl) {
+    learnEl.addEventListener("click", function (e) { if (e.target === learnEl) closeLearn(); });
+    learnEl.querySelectorAll(".ltab").forEach(function (t) {
+      t.addEventListener("click", function () {
+        learnTab = t.dataset.tab;
+        renderLearn();
+      });
+    });
+  }
+  var btnCalm = document.getElementById("btnCalm");
+  if (btnCalm) btnCalm.addEventListener("click", function () {
+    calm = !calm;
+    btnCalm.classList.toggle("active", calm);
+    btnCalm.textContent = calm ? "低动效 · 开" : "低动效";
+  });
+  var btnMore = document.getElementById("btnMore");
+  var moreMenu = document.getElementById("moreMenu");
+  if (btnMore && moreMenu) {
+    btnMore.addEventListener("click", function (e) {
+      e.stopPropagation();
+      moreMenu.classList.toggle("open");
+    });
+    document.addEventListener("click", function (e) {
+      if (!moreMenu.contains(e.target) && e.target !== btnMore) moreMenu.classList.remove("open");
+    });
+  }
+  var btnFont = document.getElementById("btnFont");
+  function setBigFont(on) {
+    document.body.classList.toggle("bigfont", on);
+    if (btnFont) {
+      btnFont.classList.toggle("active", on);
+      btnFont.textContent = on ? "大字模式 · 开" : "大字模式";
+    }
+    try { localStorage.setItem("aiBigFont", on ? "1" : "0"); } catch (e) {}
+  }
+  var bigFontSaved = false;
+  try { bigFontSaved = localStorage.getItem("aiBigFont") === "1"; } catch (e) {}
+  if (bigFontSaved) setBigFont(true);
+  if (btnFont) btnFont.addEventListener("click", function () {
+    setBigFont(!document.body.classList.contains("bigfont"));
+  });
+  if (panelBody) {
+    panelBody.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest(".term-link") : null;
+      if (!a) return;
+      var f = findTerm(decodeURIComponent(a.dataset.term));
+      if (f) showTerm(f.term, "外环 · " + stageOfTermName(f.term.name), null, "名词 · 外环环节");
+    });
+  }
+  var introStartBtn = document.getElementById("introStart");
+  if (introStartBtn) introStartBtn.addEventListener("click", function () { closeIntro(); startGuide(); });
+  var introCloseBtn = document.getElementById("introClose");
+  if (introCloseBtn) introCloseBtn.addEventListener("click", function () { closeIntro(); });
+  var introNounsBtn = document.getElementById("introNouns");
+  if (introNounsBtn) introNounsBtn.addEventListener("click", function () { closeIntro(); openNouns(); });
+  if (nounsEl) nounsEl.addEventListener("click", function (e) { if (e.target === nounsEl) closeNouns(); });
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (guideActive) { endGuide(); return; }
+      if (learnEl && learnEl.classList.contains("show")) { closeLearn(); return; }
+      if (moreMenu) moreMenu.classList.remove("open");
+      closeIntro(false); closeNouns(); closePanel();
+    }
+  });
+  function setActive(id) {
+    ["btnOuter", "btnInner", "btnAll"].forEach(function (b) {
+      var el = document.getElementById(b);
+      if (el) el.classList.toggle("active", b === id);
+    });
+  }
+  window.addEventListener("resize", function () { resize(); if (guideActive) renderGuide(); });
+  window.addEventListener("orientationchange", function () { setTimeout(resize, 260); });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", function () { resize(); });
+  }
+  window.addEventListener("load", function () { setTimeout(resize, 60); });
+
+  /* ---------- 启动 ---------- */
+  resize();
+  renderStarter();
+  updateReading();
+  if ((window.location.search || "").indexOf("anim=0") >= 0) panel.classList.add("noanim");
+  var m = (window.location.search || "").match(/sel=(outer|inner):(\d+)/);
+  if (m) selectNode(m[1], parseInt(m[2], 10));
+  var qs = window.location.search || "";
+  if (qs.indexOf("nouns=1") >= 0) {
+    openNouns();
+    var tm = qs.match(/term=([^&]+)/);
+    if (tm) {
+      var f = findTerm(decodeURIComponent(tm[1]));
+      if (f) {
+        var chips = document.querySelectorAll("#nouns .chip");
+        var hit = null;
+        for (var ci = 0; ci < chips.length; ci++) {
+          if (decodeURIComponent(chips[ci].dataset.name) === f.term.name) { hit = chips[ci]; break; }
+        }
+        showTerm(f.term, f.stage.name, hit);
+      }
+    }
+  }
+  var seenIntro = false;
+  try { seenIntro = sessionStorage.getItem("aiChainIntroSeen") === "1"; } catch (e) {}
+  if (!seenIntro && qs.indexOf("skipintro=1") < 0) openIntro();
+  if (qs.indexOf("guide=1") >= 0) {
+    startGuide();
+    var gm = qs.match(/gstep=(\d)/);
+    if (gm) { gIdx = Math.min(GUIDE_STEPS.length - 1, parseInt(gm[1], 10)); renderGuide(); }
+  }
+  if (qs.indexOf("learn=1") >= 0) {
+    openLearn();
+    var lm = qs.match(/tab=(\w+)/);
+    if (lm && LEARN[lm[1]]) { learnTab = lm[1]; renderLearn(); }
+  }
+  if (qs.indexOf("bigfont=1") >= 0) setBigFont(true);
+  // 手机首次进入提示手势
+  if (("ontouchstart" in window) && qs.indexOf("skipintro=1") < 0) {
+    setTimeout(function () { showToast("单指按住拖动 = 转环 · 双指 = 缩放页面", 6000); }, 1200);
+  }
+  requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>
